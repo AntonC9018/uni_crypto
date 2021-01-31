@@ -5,6 +5,10 @@
 
 #define in_map(map, key) map.find((key)) != map.end()
 
+const char* latin = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const char* latin_numbers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const char* latin_numbers_underscore = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+
 // Removes all occurences of a character after it has been met
 void prune_string(char* dest, const char* src)
 {
@@ -67,4 +71,19 @@ int inverse_modulo(int a, int m0)
         x += m0;
  
     return x;
+}
+
+// This function validates the message/keyword against the given alphabet.
+// Returns a pointer to the problematic character.
+const char* validate(const char* m, const char* alphabet = latin)
+{
+    while(*m != 0)
+    {
+        if (strchr(alphabet, *m) == 0)
+        {
+            return m;
+        }
+        m++;
+    }
+    return 0;
 }

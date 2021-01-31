@@ -18,6 +18,13 @@ namespace Caesar
         dest[i] = 0;
     }
 
+    const char* decrypt(const char* encrypted_message, const char* decryption_key)
+    {
+        char* buffer = (char*) malloc(strlen(encrypted_message) + 1);
+        decrypt(buffer, encrypted_message, decryption_key);
+        return buffer;
+    }
+
     // Encrypt the message into the specified buffer
     void encrypt(char* dest, const char* message, const char* encryption_key)
     {
@@ -31,17 +38,27 @@ namespace Caesar
         dest[i] = 0;
     }
 
-    const char* make_encryption_key(const char* codeword)
+    const char* encrypt(const char* message, const char* encryption_key)
+    {
+        char* buffer = (char*) malloc(strlen(message) + 1);
+        encrypt(buffer, message, encryption_key);
+        return buffer;
+    }
+
+    const char* make_encryption_key(const char* keyword)
     {
         // We'll be filling up this buffer
         char* encryption_key = (char*)malloc(num_chars);
         // We'll be putting characters into this index
         int current_index = 0;
+
         // Construct the 'met' table, which contains the characters already in the generated key
         // It will be useful for filling in the rest of the characters in alphabetical order
         char c;
         bool met[num_chars] = {0};
-        while ((c = *codeword) != 0)
+
+        // Insert the keyword first
+        while ((c = *keyword) != 0)
         {
             if (!met[c - FIRST_CHARACTER])
             {
@@ -49,11 +66,13 @@ namespace Caesar
                 current_index++;
             }
             met[c - FIRST_CHARACTER] = true;            
-            codeword++;
+            keyword++;
         }
+
         // Fill in the rest of the alphabet
         for (char c = FIRST_CHARACTER; c <= LAST_CHARACTER; c++)
         {
+            // Skip the characters that are already in the key
             if (met[c - FIRST_CHARACTER])
             {
                 continue;

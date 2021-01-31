@@ -83,7 +83,7 @@ namespace Caesar
         dest[i] = 0;
     }
 
-    const char* make_encryption_key(const char* codeword)
+    const char* make_encryption_key(const char* keyword)
     {
         // We'll be filling up this buffer
         char* encryption_key = (char*)malloc(num_chars);
@@ -93,7 +93,7 @@ namespace Caesar
         // It will be useful for filling in the rest of the characters in alphabetical order
         char c;
         bool met[num_chars] = {0};
-        while ((c = *codeword) != 0)
+        while ((c = *keyword) != 0)
         {
             if (!met[c - FIRST_CHARACTER])
             {
@@ -101,7 +101,7 @@ namespace Caesar
                 current_index++;
             }
             met[c - FIRST_CHARACTER] = true;            
-            codeword++;
+            keyword++;
         }
         // Fill in the rest of the alphabet.
         for (char c = FIRST_CHARACTER; c <= LAST_CHARACTER; c++)
@@ -149,9 +149,9 @@ Si utilizarea codului dat din main.cpp.
 int main()
 {
     const char* encrypted = "rkilusop";
-    const char* codeword = "martor";
+    const char* keyword = "martor";
 
-    const char* encryption_key = Caesar::make_encryption_key(codeword);
+    const char* encryption_key = Caesar::make_encryption_key(keyword);
     const char* decryption_key = Caesar::make_decryption_key(encryption_key);
     
     char decrypted_message[sizeof(encrypted)];
