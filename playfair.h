@@ -22,7 +22,6 @@ namespace Playfair
         return letter;
     }
 
-
     struct Key
     {
         int dim;

@@ -1,4 +1,7 @@
 #pragma once
+#include <vector>
+#include <algorithm>
+
 #define FIRST_CHARACTER 'a'
 #define LAST_CHARACTER 'z'
 #define num_chars (LAST_CHARACTER - FIRST_CHARACTER + 1)
@@ -86,4 +89,95 @@ const char* validate(const char* m, const char* alphabet = latin)
         m++;
     }
     return 0;
+}
+
+const char* alphabet_without_keyword(
+    const char* keyword, const char* alphabet = latin_numbers_underscore)
+{
+    char* result = (char*) malloc(sizeof(latin_numbers_underscore));
+    int i = 0;
+    while (*alphabet != 0)
+    {
+        if (strchr(keyword, *alphabet) == 0)
+        {
+            result[i] = *alphabet;
+            i++;
+        }
+        *alphabet++;                
+    }
+    result[i] = '\0';
+    return result;
+}
+
+inline bool contains(const std::vector<int> v, int item)
+{
+    for (auto i : v)
+    {
+        if (i == item)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+struct Thing { int index; int value; };
+
+std::vector<int> arrange(const char* string, const char* alphabet = latin_numbers_underscore)
+{
+    std::vector<int> result;
+    std::vector<Thing> things;
+    while (*string != 0)
+    {
+        int pos = (int)strchr(alphabet, *string) ;
+        if (!contains(result, pos))
+        {
+            result.push_back(pos);
+            things.push_back({ (s32)things.size(), pos });
+        }
+        string++;
+    }
+    sort(things.begin(), things.end(), [](auto a, auto b) { return a.value < b.value; });
+    for (int i = 0; i < result.size(); i++)
+    {
+        result[i] = things[i].index;
+    }
+    return std::move(result);
+}
+
+std::vector<int> without(const std::vector<int>& order, const std::vector<int>& but)
+{
+    std::vector<int> result;
+    result.reserve(order.size() - but.size());
+    for (int i : order)
+    {
+        if (!contains(but, i))
+        {
+            result.push_back(i);
+        }
+    }
+    return std::move(result);
+}
+
+const char* join_unique(const char* first, const char* all)
+{
+    // TODO: validate the first parameter (all characters from it should be contained within the second)
+    char* result = (char*) malloc(strlen(all) + 1);
+    int i = 0;
+    while (first[i] != 0)
+    {
+        result[i] = first[i];
+        i++;
+    }
+    while (*all != 0)
+    {
+        if (strchr(first, *all) == 0)
+        {
+            result[i] = *all;
+            i++;
+        }
+        all++;
+    }
+    result[i] = 0;
+    return result;
 }

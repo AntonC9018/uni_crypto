@@ -8,27 +8,8 @@
 #include "shared.h"
 
 
-
 namespace Straddling
 {
-    const char* alphabet_without_keyword(
-        const char* keyword, const char* alphabet = latin_numbers_underscore)
-    {
-        char* result = (char*) malloc(sizeof(latin_numbers_underscore));
-        int i = 0;
-        while (*alphabet != 0)
-        {
-            if (strchr(keyword, *alphabet) == 0)
-            {
-                result[i] = *alphabet;
-                i++;
-            }
-            *alphabet++;                
-        }
-        result[i] = '\0';
-        return result;
-    }
-
     typedef int Header_Encrypted_Value;
     typedef std::pair<int, int> Normal_Encrypted_Value;
 
