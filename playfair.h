@@ -1,102 +1,17 @@
+#pragma once
 #include "shared.h"
 #include <map>
 #include <vector>
+#include "polybios.h"
+#include "abc.h"
 
 namespace Playfair
 {
-    typedef char(*Letter_Map)(char); 
-    // or std::function<char, char>
-    // or use templates + one general functor (this makes most sense to me, actually).
+    using namespace Abc;
 
-    // Maps J to I and leaves the rest the same
-    char map_letter_default(char letter)
-    {
-        if (letter == 'J') return 'I';
-        return letter;
-    }
-
-    // Maps any letter to itself. Might be useful if you make sure that your message 
-    // does not use any of the characters not in the table.
-    char map_letter_identity(char letter)
-    {
-        return letter;
-    }
-
-    struct Key
-    {
-        int dim;
-        const char* table;
-    };
-
-    Key make_key(int dim, const char* keyword, 
-        Letter_Map mapf = map_letter_default, const char* alphabet = latin)
-    {
-        int table_size = dim * dim;
-        char* table = (char*)malloc(table_size);
-        memset(table, 0, table_size);
-
-        int i = 0;
-
-        // First, put in the keyword
-        while (*keyword != 0)
-        {
-            if (strchr(table, mapf(*keyword)) == 0)
-            {
-                table[i] = *keyword;
-                i++;
-            }
-            keyword++;
-        }
-
-        // Second, the rest of the alphabet
-        while (i < table_size) 
-        {
-            if (*alphabet == 0)
-            {
-                fprintf(stderr, "Not enough characters in the alphabet to fill up the key table.");
-                exit(-1);
-            }
-            if (strchr(table, mapf(*alphabet)) == 0)
-            {
-                table[i] = *alphabet;
-                i++;
-            }
-            alphabet++;
-        }
-
-        return { dim, table };
-    }
-
-    int find(char letter, Key key)
-    {
-        for (int i = 0; i < key.dim * key.dim; i++)
-        {
-            if (key.table[i] == letter)
-                return i;
-        }
-        // if we're here, the letter is not in the table
-        return -1;
-    }
-
-    void print_key(Key key)
-    {
-        printf("  ");
-        for (int j = 0; j < key.dim; j++)
-        {
-            printf("%i ", j);
-        }
-        printf("\n");
-        for (int i = 0; i < key.dim; i++)
-        {
-            printf("%i ", i);
-            for (int j = 0; j < key.dim; j++)
-            {
-                printf("%c ", key.table[i * key.dim + j]);
-            }
-            printf("\n");
-        }
-    }
-
+    using Polybios::Key;
+    using Polybios::make_key;
+    using Polybios::print_key;
 
     struct Coord
     {
@@ -172,7 +87,7 @@ namespace Playfair
         }
     }
 
-    std::vector<Digram> make_encryption_digrams(const char* message, Letter_Map mapf, char subst_char = 'X')
+    std::vector<Digram> make_encryption_digrams(const char* message, const Key& key, char subst_char = 'X')
     {
         int i = 0;
         std::vector<Digram> result;
@@ -181,10 +96,10 @@ namespace Playfair
         {
             if (message[i + 1] == 0)
             {
-                result.push_back({ mapf(message[i]), subst_char });
+                result.push_back({ key.mapf(message[i]), subst_char });
                 break;
             }
-            result.push_back({ mapf(message[i]), mapf(message[i + 1]) });
+            result.push_back({ key.mapf(message[i]), key.mapf(message[i + 1]) });
 
             i += 2;
         }
@@ -214,7 +129,7 @@ namespace Playfair
 
     // If dir == 1,  the rules for encryption are applied 
     // If dir == -1, the rules for decryption are applied
-    void apply_rules(std::vector<Digram>& digrams, const Key key, const Crypto_Action action)
+    void apply_rules(std::vector<Digram>& digrams, const Key& key, const Crypto_Action action)
     {
         for (auto& digram : digrams)
         {
@@ -265,27 +180,26 @@ namespace Playfair
         return buffer;
     }
 
-    void encrypt_digrams(std::vector<Digram>& digrams, Key key, char subst_char = 'X')
+    void encrypt_digrams(std::vector<Digram>& digrams, const Key& key, char subst_char = 'X')
     {
         subst(digrams, subst_char);
         apply_rules(digrams, key, ENCRYPT);
     }
 
-    const char* encrypt(const char* message, Key key, 
-        Letter_Map mapf = map_letter_default, char subst_char = 'X')
+    const char* encrypt(const char* message, const Key& key, char subst_char = 'X')
     {
-        auto digrams = make_encryption_digrams(message, mapf, subst_char);
+        auto digrams = make_encryption_digrams(message, key, subst_char);
         encrypt_digrams(digrams, key, subst_char);
         return join_digrams(digrams);
     }
 
-    void decrypt_digrams(std::vector<Digram>& digrams, Key key, char subst_char = 'X')
+    void decrypt_digrams(std::vector<Digram>& digrams, const Key& key, char subst_char = 'X')
     {
         apply_rules(digrams, key, DECRYPT);
         unsubst(digrams, subst_char);
     }
 
-    const char* decrypt(const char* message, Key key, char subst_char = 'X')
+    const char* decrypt(const char* message, const Key& key, char subst_char = 'X')
     {
         auto digrams = make_decryption_digrams(message);
         decrypt_digrams(digrams, key, subst_char);
