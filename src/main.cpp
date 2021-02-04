@@ -45,7 +45,7 @@ int main()
         const char* decryption_key = Caesar::make_decryption_key(encryption_key);
         
         const char* decrypted = Caesar::decrypt(encrypted, decryption_key);
-        printf("Caesar: %s -> %s", encrypted, decrypted);
+        printf("Caesar: %s -> %s\n", encrypted, decrypted);
 
         str_free(encryption_key);
         str_free(decryption_key);

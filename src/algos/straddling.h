@@ -53,11 +53,11 @@ namespace Straddling
     {
         if (i >= mp.dim || mp.order[i] >= mp.dim)
         {
-            report_error("Height limit of %i exceeded. Character: %c, Position: %i", mp.dim, *mp.char_set, i);
+            report_error("Height limit of %zu exceeded. Character: %c, Position: %zu", mp.dim, *mp.char_set, i);
         }
     }
 
-    Key make_key(Make_Params mp)
+    Key make_key(const Make_Params& mp)
     {
         Key key;
         
@@ -82,14 +82,15 @@ namespace Straddling
             i++; 
             error_if_over_limit_normal(mp, i);
         }
+        auto current_char_ptr = mp.char_set;
         while (true)
         {
-            key.encrypt_normal[*mp.char_set] = { mp.order[i], mp.order[j] };
-            key.decrypt_normal[{ mp.order[i], mp.order[j] }] = *mp.char_set;
-            mp.char_set++;
+            key.encrypt_normal[*current_char_ptr] = { mp.order[i], mp.order[j] };
+            key.decrypt_normal[{ mp.order[i], mp.order[j] }] = *current_char_ptr;
+            current_char_ptr++;
             j++;
 
-            if (*mp.char_set == 0)
+            if (*current_char_ptr == 0)
             {
                 break;
             }
@@ -110,7 +111,6 @@ namespace Straddling
         return key;
     };
 
-    // This is equivalent to Straddling
     Key make_key(const char* keyword, const std::vector<size_t>& indices, const char* scramble)
     {
         Make_Params mp;
@@ -160,18 +160,18 @@ namespace Straddling
         }
     }
 
-    std::vector<size_t> encrypt(const char* message, Key key)
+    std::vector<size_t> encrypt(const char* message, const Key& key)
     {
         std::vector<size_t> encrypted_message;
         while (*message != 0)
         {
             if (in_map(key.encrypt_header, *message))
             {
-                encrypted_message.push_back(key.encrypt_header[*message]);
+                encrypted_message.push_back(key.encrypt_header.at(*message));
             }
             else if (in_map(key.encrypt_normal, *message))
             {
-                auto val = key.encrypt_normal[*message];
+                auto val = key.encrypt_normal.at(*message);
                 encrypted_message.push_back(val.first);
                 encrypted_message.push_back(val.second);
             }
@@ -184,9 +184,9 @@ namespace Straddling
         return std::move(encrypted_message);
     }
 
-    const char* decrypt(const std::vector<size_t>& encrypted_message, Key key)
+    const char* decrypt(const std::vector<size_t>& encrypted_message, const Key& key)
     {
-        char* decrypted_message = (char*)malloc(encrypted_message.size());
+        char* decrypted_message = (char*) malloc(encrypted_message.size());
         char* current = decrypted_message;
         size_t i = 0;
         while (i < encrypted_message.size())
@@ -194,14 +194,14 @@ namespace Straddling
             size_t index;
             if (in_map(key.decrypt_header, encrypted_message[i]))
             {
-                *current = key.decrypt_header[encrypted_message[i]];
+                *current = key.decrypt_header.at(encrypted_message[i]);
             }
             else 
             {
                 Normal_Encrypted_Value encrypted_key = { encrypted_message[i], encrypted_message[i + 1] };   
                 if (in_map(key.decrypt_normal, encrypted_key))
                 {
-                    *current = key.decrypt_normal[encrypted_key];
+                    *current = key.decrypt_normal.at(encrypted_key);
                     i++;
                 }
                 else
