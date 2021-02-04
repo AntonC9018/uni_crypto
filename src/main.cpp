@@ -34,11 +34,8 @@ int main()
         const char* decrypted = Playfair::decrypt(encrypted, key);
         printf("Decrypted message: %s\n", decrypted);
 
-        printf("Heeloo1\n");
-        free(encrypted); 
-        printf("Heeloo2\n");
-        free(decrypted);
-        printf("Heeloo3\n");
+        str_free(encrypted); 
+        str_free(decrypted);
     }
     {
         const char* encrypted = "rkilusop";
@@ -50,16 +47,15 @@ int main()
         const char* decrypted = Caesar::decrypt(encrypted, decryption_key);
         printf("Caesar: %s -> %s", encrypted, decrypted);
 
-        free(encryption_key);
-        free(decryption_key);
-        free(decrypted);
+        str_free(encryption_key);
+        str_free(decryption_key);
+        str_free(decrypted);
     }
     {
         Affine::encrypt_and_decrypt_messages({ "the", "tree", "is", "a", "good", "hiding", "place" }, 7, 5); 
         Affine::encrypt_and_decrypt_messages({ "hide", "the", "gold", "in", "the", "tree", "stump" }, 5, 8);
     }
     {
-        // Currently, it leaks memory for strings and vectors.
         auto key = Straddling::make_key("MURPHY_", { 1, 3, 8 }, "PLAYWRIGHT");
         Straddling::print_key(key);
 
@@ -84,6 +80,6 @@ int main()
         auto decrypted = Straddling::decrypt(encrypted, key);
         printf("Decrypted message: %s\n", decrypted);
 
-        Straddling::destroy_key(&key);
+        Straddling::destroy_key(key);
     }
 }

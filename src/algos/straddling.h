@@ -44,7 +44,7 @@ namespace Straddling
 
     void destroy_params(Make_Params* mp)
     {
-        free(mp->char_set);
+        str_free(mp->char_set);
         mp->order.clear();
         mp->code_positions.clear();
     }
@@ -125,12 +125,12 @@ namespace Straddling
         return key;
     }
 
-    void destroy_key(Key* key)
+    void destroy_key(Key& key)
     {
-        key->encrypt_header.clear();
-        key->encrypt_normal.clear();
-        key->decrypt_header.clear();
-        key->decrypt_normal.clear();
+        key.encrypt_header.clear();
+        key.encrypt_normal.clear();
+        key.decrypt_header.clear();
+        key.decrypt_normal.clear();
     }
     
     void print_key(Key key)

@@ -94,7 +94,7 @@ const char* validate(const char* m, const char* alphabet = latin)
 const char* alphabet_without_keyword(
     const char* keyword, const char* alphabet = latin_numbers_underscore)
 {
-    char* result = (char*) malloc(sizeof(latin_numbers_underscore));
+    char* result = (char*) malloc(strlen(alphabet) + 1);
     size_t i = 0;
     while (*alphabet != 0)
     {

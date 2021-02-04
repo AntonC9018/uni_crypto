@@ -246,8 +246,8 @@ namespace Affine
             auto encrypted = encrypt(m, key);
             auto decrypted = decrypt(encrypted, key);
             printf("%s -> %s -> %s\n", m, encrypted, decrypted);
-            free(encrypted); 
-            free(decrypted);
+            str_free(encrypted); 
+            str_free(decrypted);
         }
     }
 }
