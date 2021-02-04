@@ -181,3 +181,15 @@ const char* leave_unique(const char* but, const char* all)
     result[i] = 0;
     return result;
 }
+
+size_t find_index(const std::vector<size_t>& v, size_t item)
+{
+    for (size_t i = 0; i < v.size(); i++)
+    {
+        if (v[i] == item)
+        {
+            return i;
+        }
+    }
+    return -1;
+} 

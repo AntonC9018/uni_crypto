@@ -4,6 +4,7 @@
 #include "algos/affine.h"
 #include "algos/straddling.h"
 #include "algos/playfair.h"
+#include "algos/shift.h"
 
 int main()
 {
@@ -81,5 +82,17 @@ int main()
         printf("Decrypted message: %s\n", decrypted);
 
         Straddling::destroy_key(key);
+    }
+    {
+        Shift::Key key { {5, 1, 3, 0, 4, 2}, {2, 0, 3, 1, 4} };
+
+        const char* message = "NuLasaPeMaineCePotiFaceAzi";
+        printf("Original message:  %s\n", message);
+
+        const char* encrypted = Shift::encrypt(message, key);
+        printf("Encrypted message: %s\n", encrypted);
+
+        const char* decrypted = Shift::decrypt(encrypted, key);
+        printf("Decrypted message: %s\n", decrypted);
     }
 }
