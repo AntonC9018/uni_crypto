@@ -5,6 +5,7 @@
 #include "algos/straddling.h"
 #include "algos/playfair.h"
 #include "algos/shift.h"
+#include "algos/vigenere.h"
 
 int main()
 {
@@ -93,6 +94,18 @@ int main()
         printf("Encrypted message: %s\n", encrypted);
 
         const char* decrypted = Shift::decrypt(encrypted, key);
+        printf("Decrypted message: %s\n", decrypted);
+    }
+    {
+        Vigenere::Key key { "battista" };
+
+        const char* message = "asimpleexample";
+        printf("Original message:  %s\n", message);
+
+        const char* encrypted = Vigenere::encrypt(message, key);
+        printf("Encrypted message: %s\n", encrypted);
+
+        const char* decrypted = Vigenere::decrypt(encrypted, key); 
         printf("Decrypted message: %s\n", decrypted);
     }
 }

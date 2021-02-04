@@ -4,7 +4,7 @@
 
 #define FIRST_CHARACTER 'a'
 #define LAST_CHARACTER 'z'
-#define num_chars (LAST_CHARACTER - FIRST_CHARACTER + 1)
+#define LATIN_LENGTH (LAST_CHARACTER - FIRST_CHARACTER + 1)
 
 #define in_map(map, key) map.find((key)) != map.end()
 
@@ -16,7 +16,7 @@ const char* latin_numbers_underscore = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 void prune_string(char* dest, const char* src)
 {
     char c;
-    bool met[num_chars] = {0};
+    bool met[LATIN_LENGTH] = {0};
     while ((c = *src) != 0)
     {
         if (!met[c - FIRST_CHARACTER])

@@ -48,14 +48,14 @@ namespace Caesar
     const char* make_encryption_key(const char* keyword)
     {
         // We'll be filling up this buffer
-        char* encryption_key = (char*)malloc(num_chars);
+        char* encryption_key = (char*)malloc(LATIN_LENGTH);
         // We'll be putting characters into this index
         size_t current_index = 0;
 
         // Construct the 'met' table, which contains the characters already in the generated key
         // It will be useful for filling in the rest of the characters in alphabetical order
         char c;
-        bool met[num_chars] = {0};
+        bool met[LATIN_LENGTH] = {0};
 
         // Insert the keyword first
         while ((c = *keyword) != 0)
@@ -86,8 +86,8 @@ namespace Caesar
 
     const char* make_decryption_key(const char* encryption_key)
     {
-        char* decryption_key = (char*)malloc(num_chars);
-        for (char i = 0; i < num_chars; i++)
+        char* decryption_key = (char*)malloc(LATIN_LENGTH);
+        for (char i = 0; i < LATIN_LENGTH; i++)
         {
             char index = encryption_key[i] - FIRST_CHARACTER;
             decryption_key[index] = i + FIRST_CHARACTER;
