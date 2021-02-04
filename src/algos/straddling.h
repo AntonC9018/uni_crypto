@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 
-#include "shared.h"
+#include "../shared.h"
 
 
 namespace Straddling

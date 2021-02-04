@@ -1,9 +1,9 @@
 #pragma once
-#include "shared.h"
 #include <map>
 #include <vector>
 
 #include <mydefines.h>
+#include "../shared.h"
 #include "../abc.h"
 
 
@@ -17,6 +17,11 @@ namespace Polybios
         const char* table;
         Letter_Map mapf;
     };
+
+    inline void destroy_key(Key& key)
+    {
+        str_free(key.table);
+    }
 
     Key make_key(size_t dim, const char* keyword, 
         Letter_Map mapf = map_letter_default, const char* alphabet = latin)
@@ -56,15 +61,9 @@ namespace Polybios
         return { dim, table, mapf };
     }
 
-    size_t find(char letter, Key key)
+    inline size_t find(char letter, Key key)
     {
-        for (size_t i = 0; i < key.dim * key.dim; i++)
-        {
-            if (key.table[i] == letter)
-                return i;
-        }
-        // if we're here, the letter is not in the table
-        return -1;
+        return find_index(key.table, letter, key.dim * key.dim);
     }
 
     void print_key(Key key)

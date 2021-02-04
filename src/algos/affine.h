@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <mydefines.h>
-#include "shared.h"
+#include "../shared.h"
 
 namespace Affine
 {

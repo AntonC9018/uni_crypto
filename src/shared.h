@@ -193,3 +193,15 @@ size_t find_index(const std::vector<size_t>& v, size_t item)
     }
     return -1;
 } 
+
+char find_index(const char* any_string, char it, size_t element_count)
+{
+    for (size_t i = 0; i < element_count; i++)
+    {
+        if (any_string[i] == it)
+        {
+            return i;
+        }
+    }
+    return -1;
+}

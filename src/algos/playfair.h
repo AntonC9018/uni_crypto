@@ -1,9 +1,10 @@
 #pragma once
-#include "shared.h"
 #include <map>
 #include <vector>
 #include "polybios.h"
+#include "../shared.h"
 #include "../abc.h"
+#include "common.h"
 
 namespace Playfair
 {
@@ -120,12 +121,6 @@ namespace Playfair
         }
         return std::move(result);
     }
-
-    enum Crypto_Action
-    {
-        ENCRYPT = 1,
-        DECRYPT = -1
-    };
 
     // If dir == 1,  the rules for encryption are applied 
     // If dir == -1, the rules for decryption are applied

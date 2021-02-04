@@ -6,6 +6,7 @@
 #include "algos/playfair.h"
 #include "algos/shift.h"
 #include "algos/vigenere.h"
+#include "algos/bazeries.h"
 
 int main()
 {
@@ -82,6 +83,7 @@ int main()
         auto decrypted = Straddling::decrypt(encrypted, key);
         printf("Decrypted message: %s\n", decrypted);
 
+        str_free(decrypted);
         Straddling::destroy_key(key);
     }
     {
@@ -95,6 +97,10 @@ int main()
 
         const char* decrypted = Shift::decrypt(encrypted, key);
         printf("Decrypted message: %s\n", decrypted);
+        
+        str_free(encrypted);
+        str_free(decrypted);
+        Shift::destroy_key(key);
     }
     {
         Vigenere::Key key { "battista" };
@@ -107,5 +113,24 @@ int main()
 
         const char* decrypted = Vigenere::decrypt(encrypted, key); 
         printf("Decrypted message: %s\n", decrypted);
+
+        str_free(encrypted);
+        str_free(decrypted);
+    }
+    {
+        auto key = Bazeries::make_key("SEVENTHOUSANDTHREEHUNDREDANDFIFTYTWO", { 7, 3, 5, 2 });
+
+        const char* message = "ACLEARCONSCIENCEISUSUALLYTHESIGNOFABADMEMORY";
+        printf("Original message:  %s\n", message);
+
+        const char* encrypted = Bazeries::encrypt(message, key);
+        printf("Encrypted message: %s\n", encrypted);
+
+        const char* decrypted = Bazeries::decrypt(encrypted, key);
+        printf("Decrypted message: %s\n", decrypted);
+
+        Bazeries::destroy_key(key);
+        str_free(encrypted);
+        str_free(decrypted);
     }
 }
