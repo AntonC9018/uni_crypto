@@ -2,7 +2,10 @@
 #include "shared.h"
 #include <map>
 #include <vector>
-#include "abc.h"
+
+#include <mydefines.h>
+#include "../abc.h"
+
 
 namespace Polybios
 {
@@ -10,19 +13,19 @@ namespace Polybios
     
     struct Key
     {
-        int dim;
+        size_t dim;
         const char* table;
         Letter_Map mapf;
     };
 
-    Key make_key(int dim, const char* keyword, 
+    Key make_key(size_t dim, const char* keyword, 
         Letter_Map mapf = map_letter_default, const char* alphabet = latin)
     {
-        int table_size = dim * dim;
+        size_t table_size = dim * dim;
         char* table = (char*) malloc(table_size);
         memset(table, 0, table_size);
 
-        int i = 0;
+        size_t i = 0;
 
         // First, put in the keyword
         while (*keyword != 0)
@@ -40,8 +43,7 @@ namespace Polybios
         {
             if (*alphabet == 0)
             {
-                fprintf(stderr, "Not enough characters in the alphabet to fill up the key table.");
-                exit(-1);
+                report_error("Not enough characters in the alphabet to fill up the key table.");
             }
             if (strchr(table, mapf(*alphabet)) == 0)
             {
@@ -54,9 +56,9 @@ namespace Polybios
         return { dim, table, mapf };
     }
 
-    int find(char letter, Key key)
+    size_t find(char letter, Key key)
     {
-        for (int i = 0; i < key.dim * key.dim; i++)
+        for (size_t i = 0; i < key.dim * key.dim; i++)
         {
             if (key.table[i] == letter)
                 return i;
@@ -68,15 +70,15 @@ namespace Polybios
     void print_key(Key key)
     {
         printf("  ");
-        for (int j = 0; j < key.dim; j++)
+        for (size_t j = 0; j < key.dim; j++)
         {
-            printf("%i ", j);
+            printf("%zu ", j);
         }
         printf("\n");
-        for (int i = 0; i < key.dim; i++)
+        for (size_t i = 0; i < key.dim; i++)
         {
-            printf("%i ", i);
-            for (int j = 0; j < key.dim; j++)
+            printf("%zu ", i);
+            for (size_t j = 0; j < key.dim; j++)
             {
                 printf("%c ", key.table[i * key.dim + j]);
             }

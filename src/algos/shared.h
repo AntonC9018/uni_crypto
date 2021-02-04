@@ -95,7 +95,7 @@ const char* alphabet_without_keyword(
     const char* keyword, const char* alphabet = latin_numbers_underscore)
 {
     char* result = (char*) malloc(sizeof(latin_numbers_underscore));
-    int i = 0;
+    size_t i = 0;
     while (*alphabet != 0)
     {
         if (strchr(keyword, *alphabet) == 0)
@@ -109,7 +109,7 @@ const char* alphabet_without_keyword(
     return result;
 }
 
-inline bool contains(const std::vector<int> v, int item)
+inline bool contains(const std::vector<size_t>& v, size_t item)
 {
     for (auto i : v)
     {
@@ -121,35 +121,35 @@ inline bool contains(const std::vector<int> v, int item)
     return false;
 }
 
-struct Thing { int index; int value; };
+struct Thing { size_t index; size_t value; };
 
-std::vector<int> arrange(const char* string, const char* alphabet = latin_numbers_underscore)
+std::vector<size_t> arrange(const char* string, const char* alphabet = latin_numbers_underscore)
 {
-    std::vector<int> result;
+    std::vector<size_t> result;
     std::vector<Thing> things;
     while (*string != 0)
     {
-        int pos = (int)strchr(alphabet, *string) ;
+        size_t pos = (size_t)strchr(alphabet, *string);
         if (!contains(result, pos))
         {
             result.push_back(pos);
-            things.push_back({ (s32)things.size(), pos });
+            things.push_back({ things.size(), pos });
         }
         string++;
     }
     sort(things.begin(), things.end(), [](auto a, auto b) { return a.value < b.value; });
-    for (int i = 0; i < result.size(); i++)
+    for (size_t i = 0; i < result.size(); i++)
     {
         result[i] = things[i].index;
     }
     return std::move(result);
 }
 
-std::vector<int> without(const std::vector<int>& order, const std::vector<int>& but)
+std::vector<size_t> without(const std::vector<size_t>& order, const std::vector<size_t>& but)
 {
-    std::vector<int> result;
+    std::vector<size_t> result;
     result.reserve(order.size() - but.size());
-    for (int i : order)
+    for (size_t i : order)
     {
         if (!contains(but, i))
         {
@@ -159,19 +159,19 @@ std::vector<int> without(const std::vector<int>& order, const std::vector<int>& 
     return std::move(result);
 }
 
-const char* join_unique(const char* first, const char* all)
+const char* leave_unique(const char* but, const char* all)
 {
     // TODO: validate the first parameter (all characters from it should be contained within the second)
     char* result = (char*) malloc(strlen(all) + 1);
-    int i = 0;
-    while (first[i] != 0)
+    size_t i = 0;
+    while (but[i] != 0)
     {
-        result[i] = first[i];
+        result[i] = but[i];
         i++;
     }
     while (*all != 0)
     {
-        if (strchr(first, *all) == 0)
+        if (strchr(but, *all) == 0)
         {
             result[i] = *all;
             i++;

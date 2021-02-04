@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 #include "polybios.h"
-#include "abc.h"
+#include "../abc.h"
 
 namespace Playfair
 {
@@ -15,13 +15,13 @@ namespace Playfair
 
     struct Coord
     {
-        int row; 
-        int col;
+        size_t row; 
+        size_t col;
     };
 
     inline Coord find_coord(char letter, Key key)
     {
-        int i = find(letter, key);
+        size_t i = find(letter, key);
         return { i / key.dim, i % key.dim }; 
     }
 
@@ -89,7 +89,7 @@ namespace Playfair
 
     std::vector<Digram> make_encryption_digrams(const char* message, const Key& key, char subst_char = 'X')
     {
-        int i = 0;
+        size_t i = 0;
         std::vector<Digram> result;
 
         while (message[i] != 0)
@@ -111,7 +111,7 @@ namespace Playfair
     // Also assumes the used character sets match
     std::vector<Digram> make_decryption_digrams(const char* message)
     {
-        int i = 0;
+        size_t i = 0;
         std::vector<Digram> result;
         while (message[i] != 0)
         {
@@ -129,7 +129,7 @@ namespace Playfair
 
     // If dir == 1,  the rules for encryption are applied 
     // If dir == -1, the rules for decryption are applied
-    void apply_rules(std::vector<Digram>& digrams, const Key& key, const Crypto_Action action)
+    void apply_rules(std::vector<Digram>& digrams, const Key& key, Crypto_Action action)
     {
         for (auto& digram : digrams)
         {
@@ -169,7 +169,7 @@ namespace Playfair
     {
         char* buffer = (char*) malloc(digrams.size() * 2 + 1);
         printf("Joining digrams: ");
-        for (int i = 0; i < digrams.size(); i++)
+        for (size_t i = 0; i < digrams.size(); i++)
         {
             printf("%c%c ", digrams[i].first, digrams[i].second);
             buffer[2 * i] = digrams[i].first;

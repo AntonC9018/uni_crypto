@@ -1,1 +1,1 @@
-g++ -std=c++17 main.cpp -I../includes
+g++ -std=c++17 ./src/main.cpp -I../includes

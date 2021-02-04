@@ -19,9 +19,9 @@ namespace Affine
 
     const char* encrypt(const char* message, Key key)
     {
-        s64 len = strlen(message);
-        char* encrypted_message = (char*)malloc(len + 1);
-        for (s64 i = 0; i < len; i++)
+        size_t len = strlen(message);
+        char* encrypted_message = (char*) malloc(len + 1);
+        for (size_t i = 0; i < len; i++)
         {
             char mod = ((message[i] - FIRST_CHARACTER) * key.a + key.b) % num_chars;
             encrypted_message[i] = mod + FIRST_CHARACTER;
@@ -32,9 +32,9 @@ namespace Affine
 
     const char* decrypt(const char* encrypted_message, Key key)
     {
-        s64 len = strlen(encrypted_message);
-        char* decrypted_message = (char*)malloc(len + 1);
-        for (s64 i = 0; i < len; i++)
+        size_t len = strlen(encrypted_message);
+        char* decrypted_message = (char*) malloc(len + 1);
+        for (size_t i = 0; i < len; i++)
         {
             char mod = ((encrypted_message[i] - FIRST_CHARACTER - key.b + num_chars) * key.a_inv) % num_chars;
             decrypted_message[i] = mod + FIRST_CHARACTER;
@@ -47,8 +47,7 @@ namespace Affine
     {
         if (!are_coprime(a, num_chars))
         {
-            fprintf(stderr, "a (%i) must be coprime to the total character count (%i).\n", a, num_chars);
-            exit(-1);
+            report_error("a (%i) must be coprime to the total character count (%i).\n", a, num_chars);
         }
         
         Key key;
@@ -68,8 +67,8 @@ namespace Affine
             auto encrypted = encrypt(m, key);
             auto decrypted = decrypt(encrypted, key);
             printf("%s -> %s -> %s\n", m, encrypted, decrypted);
-            free((void*)encrypted); 
-            free((void*)decrypted);
+            free(encrypted); 
+            free(decrypted);
         }
     }
 }

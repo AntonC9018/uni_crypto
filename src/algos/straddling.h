@@ -10,8 +10,8 @@
 
 namespace Straddling
 {
-    typedef int Header_Encrypted_Value;
-    typedef std::pair<int, int> Normal_Encrypted_Value;
+    typedef size_t Header_Encrypted_Value;
+    typedef std::pair<size_t, size_t> Normal_Encrypted_Value;
 
     struct Key
     {
@@ -35,19 +35,25 @@ namespace Straddling
     // TODO: clean memory of vectors.
     struct Make_Params
     {
-        const char* keyword;
-        std::vector<int> order;
-        std::vector<int> code_positions;
-        const char* char_set;
-        int dim;
+        const char* keyword; // not owned
+        std::vector<size_t> order;
+        std::vector<size_t> code_positions;
+        const char* char_set; // owned
+        size_t dim;
     };
 
-    inline void error_if_over_limit_normal(Make_Params mp, int i)
+    void destroy_params(Make_Params* mp)
+    {
+        free(mp->char_set);
+        mp->order.clear();
+        mp->code_positions.clear();
+    }
+
+    inline void error_if_over_limit_normal(Make_Params mp, size_t i)
     {
         if (i >= mp.dim || mp.order[i] >= mp.dim)
         {
-            fprintf(stderr, "Height limit of %i exceeded. Character: %c, Position: %i", mp.dim, *mp.char_set, i);
-            exit(-1);
+            report_error("Height limit of %i exceeded. Character: %c, Position: %i", mp.dim, *mp.char_set, i);
         }
     }
 
@@ -56,13 +62,12 @@ namespace Straddling
         Key key;
         
         {
-            int i = 0;
+            size_t i = 0;
             while (mp.keyword[i] != 0)
             {
                 if (mp.code_positions[i] >= mp.dim)
                 {
-                    fprintf(stderr, "Height limit of %i exceeded", mp.dim);
-                    exit(-1);
+                    report_error("Height limit of %i exceeded", mp.dim);
                 }
                 key.encrypt_header[mp.keyword[i]] = { mp.code_positions[i] };
                 key.decrypt_header[{ mp.code_positions[i] }] = mp.keyword[i];
@@ -70,8 +75,8 @@ namespace Straddling
             }
         }
 
-        int i = 0;
-        int j = 0;
+        size_t i = 0;
+        size_t j = 0;
         while (in_map(key.decrypt_header, mp.order[i]))
         {
             i++; 
@@ -106,37 +111,33 @@ namespace Straddling
     };
 
     // This is equivalent to Straddling
-    Key make_key_default(const char* keyword)
+    Key make_key(const char* keyword, const std::vector<size_t>& indices, const char* scramble)
     {
         Make_Params mp;
-        mp.keyword = keyword;
-        mp.char_set = alphabet_without_keyword(keyword);
+        mp.keyword = keyword;                                   // not owned
+        mp.char_set = alphabet_without_keyword(keyword);        // owned
+        mp.order = arrange(scramble, latin_numbers_underscore); // owned
+        mp.code_positions = without(mp.order, indices);         // owned
         mp.dim = 10;
-        mp.order = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-        int keyword_length = strlen(keyword);
-        mp.code_positions.reserve(keyword_length);
-        for (int i = 0; i < keyword_length; i++)
-        {
-            mp.code_positions.push_back(i);
-        }
-
-        return make_key(mp);
+        Key key = make_key(mp);
+        destroy_params(&mp);
+        return key;
     }
 
-    void destroy_key(Key key)
+    void destroy_key(Key* key)
     {
-        key.encrypt_header.clear();
-        key.encrypt_normal.clear();
-        key.decrypt_header.clear();
-        key.decrypt_normal.clear();
+        key->encrypt_header.clear();
+        key->encrypt_normal.clear();
+        key->decrypt_header.clear();
+        key->decrypt_normal.clear();
     }
     
     void print_key(Key key)
     {
         char table[12][11];
         memset(table, '-', 12 * 11);
-        for (int i = 0; i < 10; i++)
+        for (char i = 0; i < 10; i++)
         {
             table[0][i + 1] = '0' + i;
         }
@@ -149,9 +150,9 @@ namespace Straddling
             table[2 + value.first][1 + value.second] = key;
             table[2 + value.first][0] = value.first + '0';
         }
-        for (int i = 0; i < 12; i++)
+        for (size_t i = 0; i < 12; i++)
         {
-            for (int j = 0; j < 11; j++)
+            for (size_t j = 0; j < 11; j++)
             {
                 printf("%c ", table[i][j]); 
             }
@@ -159,9 +160,9 @@ namespace Straddling
         }
     }
 
-    std::vector<int> encrypt(const char* message, Key key)
+    std::vector<size_t> encrypt(const char* message, Key key)
     {
-        std::vector<int> encrypted_message;
+        std::vector<size_t> encrypted_message;
         while (*message != 0)
         {
             if (in_map(key.encrypt_header, *message))
@@ -176,22 +177,21 @@ namespace Straddling
             }
             else
             {
-                fprintf(stderr, "The character %c is not present in the dictionary.", *message);
-                exit(-1);
+                report_error("The character %c is not present in the dictionary.", *message);
             }
             message++;
         }
         return std::move(encrypted_message);
     }
 
-    const char* decrypt(const std::vector<int>& encrypted_message, Key key)
+    const char* decrypt(const std::vector<size_t>& encrypted_message, Key key)
     {
         char* decrypted_message = (char*)malloc(encrypted_message.size());
         char* current = decrypted_message;
-        int i = 0;
+        size_t i = 0;
         while (i < encrypted_message.size())
         {
-            int index;
+            size_t index;
             if (in_map(key.decrypt_header, encrypted_message[i]))
             {
                 *current = key.decrypt_header[encrypted_message[i]];
@@ -206,9 +206,8 @@ namespace Straddling
                 }
                 else
                 {
-                    fprintf(stderr, "The encrypted combination (%i, %i) is not present in the dictionary.",
+                    report_error("The encrypted combination (%i, %i) is not present in the dictionary.",
                         encrypted_key.first, encrypted_key.second);
-                    exit(-1);
                 }
             }
             i++;

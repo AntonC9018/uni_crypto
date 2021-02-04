@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <mydefines.h>
-#include "caesar.h"
-#include "affine.h"
-#include "straddling.h"
-#include "playfair.h"
+#include "algos/caesar.h"
+#include "algos/affine.h"
+#include "algos/straddling.h"
+#include "algos/playfair.h"
 
 int main()
 {
@@ -34,8 +34,11 @@ int main()
         const char* decrypted = Playfair::decrypt(encrypted, key);
         printf("Decrypted message: %s\n", decrypted);
 
-        free((void*)encrypted); 
-        free((void*)decrypted);
+        printf("Heeloo1\n");
+        free(encrypted); 
+        printf("Heeloo2\n");
+        free(decrypted);
+        printf("Heeloo3\n");
     }
     {
         const char* encrypted = "rkilusop";
@@ -47,9 +50,9 @@ int main()
         const char* decrypted = Caesar::decrypt(encrypted, decryption_key);
         printf("Caesar: %s -> %s", encrypted, decrypted);
 
-        free((void*)encryption_key);
-        free((void*)decryption_key);
-        free((void*)decrypted);
+        free(encryption_key);
+        free(decryption_key);
+        free(decrypted);
     }
     {
         Affine::encrypt_and_decrypt_messages({ "the", "tree", "is", "a", "good", "hiding", "place" }, 7, 5); 
@@ -57,16 +60,7 @@ int main()
     }
     {
         // Currently, it leaks memory for strings and vectors.
-        // auto key = Straddling::make_key_default("MURPHY_");
-
-        Straddling::Make_Params mp;
-        mp.keyword = "MURPHY_";
-        mp.code_positions = { 6, 5, 0, 9, 7, 4, 2 };
-        mp.order = { 6, 5, 1, 0, 9, 7, 4, 2, 3, 8 };
-        mp.dim = 10;
-        mp.char_set = "ABCDEFGIJKLNOQSTVWXZ0123456789";
-
-        auto key = Straddling::make_key(mp);
+        auto key = Straddling::make_key("MURPHY_", { 1, 3, 8 }, "PLAYWRIGHT");
         Straddling::print_key(key);
 
         const char* message = "CLOCKS_WILL_RUN_MORE_QUICKLY_DURING_FREE_TIME";
@@ -75,10 +69,10 @@ int main()
         auto encrypted = Straddling::encrypt(message, key);
         printf("Encrypted message: "); 
         {
-            const int block_size = 5;
-            for (int i = 0; i < encrypted.size(); i ++)
+            const size_t block_size = 5;
+            for (size_t i = 0; i < encrypted.size(); i ++)
             {
-                printf("%i", encrypted[i]);
+                printf("%zu", encrypted[i]);
                 if (i % block_size == block_size - 1)
                 {
                     printf(" ");
@@ -90,6 +84,6 @@ int main()
         auto decrypted = Straddling::decrypt(encrypted, key);
         printf("Decrypted message: %s\n", decrypted);
 
-        Straddling::destroy_key(key);
+        Straddling::destroy_key(&key);
     }
 }

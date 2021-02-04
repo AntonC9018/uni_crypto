@@ -9,7 +9,7 @@ namespace Caesar
     void decrypt(char* dest, const char* encrypted_message, const char* decryption_key)
     {
         char c;
-        int i = 0;
+        size_t i = 0;
         while ((c = encrypted_message[i]) != 0)
         {
             dest[i] = decryption_key[c - FIRST_CHARACTER];
@@ -29,7 +29,7 @@ namespace Caesar
     void encrypt(char* dest, const char* message, const char* encryption_key)
     {
         char c;
-        int i = 0;
+        size_t i = 0;
         while ((c = message[i]) != 0)
         {
             dest[i] = encryption_key[c - FIRST_CHARACTER];
@@ -50,7 +50,7 @@ namespace Caesar
         // We'll be filling up this buffer
         char* encryption_key = (char*)malloc(num_chars);
         // We'll be putting characters into this index
-        int current_index = 0;
+        size_t current_index = 0;
 
         // Construct the 'met' table, which contains the characters already in the generated key
         // It will be useful for filling in the rest of the characters in alphabetical order
