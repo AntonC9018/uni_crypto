@@ -208,6 +208,7 @@ namespace Straddling
                 {
                     report_error("The encrypted combination (%i, %i) is not present in the dictionary.",
                         encrypted_key.first, encrypted_key.second);
+                    return NULL;
                 }
             }
             i++;

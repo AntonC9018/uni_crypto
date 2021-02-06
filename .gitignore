@@ -1,3 +1,4 @@
 a.exe
 .vscode
 *_old.*
+third_party\*
