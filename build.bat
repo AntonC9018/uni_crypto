@@ -1,1 +1,3 @@
-g++ -std=c++17 ./src/main.cpp -I../includes
+g++ -std=c++17 ^
+ ./src/main.cpp ^
+ -Ithird_party -I../includes

@@ -7,6 +7,7 @@
 #include "algos/shift.h"
 #include "algos/vigenere.h"
 #include "algos/bazeries.h"
+// #include <strlib.h>
 
 int main()
 {
