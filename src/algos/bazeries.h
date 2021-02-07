@@ -24,7 +24,7 @@ namespace Bazeries
         str_t transposed_alphabet;
     };
 
-    internal str_t take_alphabet_through_map_and_transpose(size_t dim, str_view_t alphabet, Letter_Map mapf)
+    static str_t take_alphabet_through_map_and_transpose(size_t dim, str_view_t alphabet, Letter_Map mapf)
     {
         str_t str = Abc::take_alphabet_through_map(alphabet, mapf);
         
@@ -66,7 +66,7 @@ namespace Bazeries
         key.numeric_keyword.clear();
     }
 
-    internal str_t xxcrypt(str_view_t message, const Key& key, Crypto_Action action)
+    static str_t xxcrypt(str_view_t message, const Key& key, Crypto_Action action)
     {
         str_t result = str_make(message.length);
 
