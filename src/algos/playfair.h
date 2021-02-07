@@ -88,21 +88,19 @@ namespace Playfair
         }
     }
 
-    std::vector<Digram> make_encryption_digrams(const char* message, const Key& key, char subst_char = 'X')
+    std::vector<Digram> make_encryption_digrams(str_view_t message, const Key& key, char subst_char = 'X')
     {
         size_t i = 0;
         std::vector<Digram> result;
 
-        while (message[i] != 0)
+        for (size_t i = 0; i < message.length; i += 2)
         {
-            if (message[i + 1] == 0)
+            if (i == message.length - 1)
             {
-                result.push_back({ key.mapf(message[i]), subst_char });
+                result.push_back({ key.mapf(message.chars[i]), subst_char });
                 break;
             }
-            result.push_back({ key.mapf(message[i]), key.mapf(message[i + 1]) });
-
-            i += 2;
+            result.push_back({ key.mapf(message.chars[i]), key.mapf(message.chars[i + 1]) });
         }
 
         return std::move(result);
@@ -110,14 +108,12 @@ namespace Playfair
 
     // Assumes the length of message is even
     // Also assumes the used character sets match
-    std::vector<Digram> make_decryption_digrams(const char* message)
+    std::vector<Digram> make_decryption_digrams(str_view_t message)
     {
-        size_t i = 0;
         std::vector<Digram> result;
-        while (message[i] != 0)
+        for (size_t i = 0; i < message.length; i += 2)
         {
-            result.push_back({ message[i], message[i + 1] });
-            i += 2;
+            result.push_back({ message.chars[i], message.chars[i + 1] });
         }
         return std::move(result);
     }
@@ -160,19 +156,18 @@ namespace Playfair
         }
     }
 
-    const char* join_digrams(const std::vector<Digram>& digrams)
+    str_t join_digrams(const std::vector<Digram>& digrams)
     {
-        char* buffer = (char*) malloc(digrams.size() * 2 + 1);
+        str_t result = str_make(digrams.size() * 2);
         printf("Joining digrams: ");
         for (size_t i = 0; i < digrams.size(); i++)
         {
             printf("%c%c ", digrams[i].first, digrams[i].second);
-            buffer[2 * i] = digrams[i].first;
-            buffer[2 * i + 1] = digrams[i].second;
+            result[2 * i] = digrams[i].first;
+            result[2 * i + 1] = digrams[i].second;
         }
         printf("\n");
-        buffer[digrams.size() * 2] = 0;
-        return buffer;
+        return result;
     }
 
     void encrypt_digrams(std::vector<Digram>& digrams, const Key& key, char subst_char = 'X')
@@ -181,7 +176,7 @@ namespace Playfair
         apply_rules(digrams, key, ENCRYPT);
     }
 
-    const char* encrypt(const char* message, const Key& key, char subst_char = 'X')
+    str_t encrypt(str_view_t message, const Key& key, char subst_char = 'X')
     {
         auto digrams = make_encryption_digrams(message, key, subst_char);
         encrypt_digrams(digrams, key, subst_char);
@@ -194,7 +189,7 @@ namespace Playfair
         unsubst(digrams, subst_char);
     }
 
-    const char* decrypt(const char* message, const Key& key, char subst_char = 'X')
+    str_t decrypt(str_view_t message, const Key& key, char subst_char = 'X')
     {
         auto digrams = make_decryption_digrams(message);
         decrypt_digrams(digrams, key, subst_char);

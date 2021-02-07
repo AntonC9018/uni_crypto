@@ -26,21 +26,18 @@ namespace Shift
     // lin_perm[x], col_perm[y]. To go back, find the encrypted x and y
     // in these lists and take the index.
     // I'm going to represent the letters as a linear array.
-    const char* encrypt(const char* message, const Key& key)
+    str_t encrypt(str_view_t message, const Key& key)
     {
         // The dimensions of the output message are going to be width * height of the key
-        size_t encrypted_message_size = key.col_perm.size() * key.row_perm.size();
-        char* encrypted = (char*) malloc(encrypted_message_size + 1);
+        str_t encrypted = str_make(key.col_perm.size() * key.row_perm.size());
         // Fill the buffer with spaces at start.
-        memset(encrypted, ' ', encrypted_message_size);
-        // Null terminate the buffer right away
-        encrypted[encrypted_message_size] = 0;
+        memset(encrypted.chars, ' ', encrypted.length);
 
         // Make sure the length of the message is no more than that.
-        if (strlen(message) > encrypted_message_size)
+        if (message.length > encrypted.length)
         {
             report_error("The message is too large. Max size for the given key is %uz, but the message had size %uz. Here it is: %s", 
-                encrypted_message_size, strlen(message), message);
+                encrypted.length, message.length, message.chars);
         }
 
         // Fill in the spots with the characters permuted according to the key.
@@ -59,18 +56,16 @@ namespace Shift
         return encrypted;
     }
 
-    const char* decrypt(const char* encrypted, const Key& key)
+    str_t decrypt(str_view_t encrypted, const Key& key)
     {
         // The dimensions of the output message are going to be width * height of the key
-        size_t message_size = key.col_perm.size() * key.row_perm.size();
-        char* decrypted = (char*) malloc(message_size + 1);
-        decrypted[message_size] = 0;
+        str_t decrypted = str_make(key.col_perm.size() * key.row_perm.size());
 
         // May as well validate the encrypted message
-        if (strlen(encrypted) != message_size)
+        if (encrypted.length != decrypted.length)
         {
             report_error("Unexpected encrypted message length. Expected %zu, got %zu", 
-                message_size, strlen(encrypted)); 
+                decrypted.length, decrypted.length); 
         }
 
         size_t index = 0;

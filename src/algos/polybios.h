@@ -14,7 +14,7 @@ namespace Polybios
     struct Key
     {
         size_t dim;
-        const char* table;
+        str_t table;
         Letter_Map mapf;
     };
 
@@ -23,47 +23,52 @@ namespace Polybios
         str_free(key.table);
     }
 
-    Key make_key(size_t dim, const char* keyword, 
-        Letter_Map mapf = map_letter_default, const char* alphabet = latin)
+    Key make_key(size_t dim, str_view_t keyword, 
+        Letter_Map mapf = map_letter_default, str_view_t alphabet = latin)
     {
-        size_t table_size = dim * dim;
-        char* table = (char*) malloc(table_size);
-        memset(table, 0, table_size);
+        // Make sure the entire alphabet will fit
+        if (alphabet.length < dim * dim)
+        {
+            report_error("Not enough characters in the alphabet to fill up the key table.");
+        }
+
+        Key key;
+        key.dim = dim;
+        key.mapf = mapf;
+        key.table = str_make_zeros(dim * dim);
 
         size_t i = 0;
 
         // First, put in the keyword
-        while (*keyword != 0)
+        for (size_t j = 0; j < keyword.length; j++)
         {
-            if (strchr(table, mapf(*keyword)) == 0)
+            if (!str_has_char(key.table, mapf(keyword[j])))
             {
-                table[i] = *keyword;
+                key.table[i] = keyword[j];
                 i++;
             }
-            keyword++;
         }
 
         // Second, the rest of the alphabet
-        while (i < table_size) 
+        for (size_t j = 0; j < alphabet.length; j++) 
         {
-            if (*alphabet == 0)
+            if (!str_has_char(key.table, mapf(alphabet[j])))
             {
-                report_error("Not enough characters in the alphabet to fill up the key table.");
-            }
-            if (strchr(table, mapf(*alphabet)) == 0)
-            {
-                table[i] = *alphabet;
+                if (i == key.table.length)
+                {
+                    report_error("Too many characters in the key table");
+                }
+                key.table[i] = alphabet[j];
                 i++;
             }
-            alphabet++;
         }
 
-        return { dim, table, mapf };
+        return key;
     }
 
     inline size_t find(char letter, Key key)
     {
-        return find_index(key.table, letter, key.dim * key.dim);
+        return str_find_char_index(str_view(key.table), letter);
     }
 
     void print_key(Key key)

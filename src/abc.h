@@ -1,4 +1,5 @@
 #pragma once
+#include <strlib.h>
 #include "shared.h"
 
 namespace Abc
@@ -22,23 +23,19 @@ namespace Abc
     }
 
     // Takes the given alphabet through the given map
-    char* take_alphabet_through_map(size_t expected_size, const char* alphabet, Letter_Map mapf)
+    str_t take_alphabet_through_map(str_view_t alphabet, Letter_Map mapf)
     {
-        char* a = (char*) calloc(1, expected_size);
-        for (size_t i = 0; i < expected_size; i++)
-        {
-            while (strchr(a, mapf(*alphabet)) != 0 && *alphabet != 0)
-                alphabet++;
-            
-            if (*alphabet == 0)
-            {
-                report_error("Wrong number of characters for this size");
-                return NULL;
-            }
+        str_builder_t a = strb_create(alphabet.length);
 
-            a[i] = *alphabet;
-            alphabet++;
+        for (size_t j = 0; j < alphabet.length; j++)
+        {
+            char ch = mapf(alphabet[j]);
+            if (!strb_has_char(a, ch))
+            {
+                strb_chr(a, ch);
+            }
         }
-        return a;
+
+        return strb_build(a);
     }
 }

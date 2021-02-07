@@ -21,27 +21,36 @@ namespace Bazeries
     {
         Polybios::Key poly;
         std::vector<char> numeric_keyword;
-        const char* transposed_alphabet;
+        str_t transposed_alphabet;
     };
 
-    internal char* take_alphabet_through_map_and_transpose(size_t dim, const char* alphabet, Letter_Map mapf)
+    internal str_t take_alphabet_through_map_and_transpose(size_t dim, str_view_t alphabet, Letter_Map mapf)
     {
-        char* chars = Abc::take_alphabet_through_map(dim * dim, alphabet, mapf);
+        str_t str = Abc::take_alphabet_through_map(alphabet, mapf);
+        
+        if (str.length != dim * dim)
+        {
+            report_error("Unexpected alphabet size %zu. Expected %zu", str.length, dim * dim);
+        }
+
         // All that's left is to transpose the chars
-        char* alpha = (char*) malloc(dim * dim);
+        str_t alpha = str_make(str.length);
+
         for (size_t row = 0; row < dim; row++)
         {
             for (size_t col = 0; col < dim; col++)
             {
-                alpha[col * dim + row] = chars[row * dim + col];   
+                alpha[col * dim + row] = str[row * dim + col];   
             }
         }
+
+        str_free(str);
 
         return alpha;
     }
 
-    inline Key make_key(const char* keyword, std::vector<char> numeric_keyword, 
-        size_t dim = 5, Letter_Map mapf = map_letter_default, const char* alphabet = latin)
+    inline Key make_key(str_view_t keyword, std::vector<char> numeric_keyword, 
+        size_t dim = 5, Letter_Map mapf = map_letter_default, str_view_t alphabet = latin)
     {
         Key key;
         key.poly = Polybios::make_key(dim, keyword, mapf, alphabet);
@@ -57,18 +66,17 @@ namespace Bazeries
         key.numeric_keyword.clear();
     }
 
-    internal const char* xxcrypt(const char* message, const Key& key, Crypto_Action action)
+    internal str_t xxcrypt(str_view_t message, const Key& key, Crypto_Action action)
     {
-        size_t message_length = strlen(message);
-        char* result = (char*) malloc(message_length + 1);
-        result[message_length] = 0;
+        str_t result = str_make(message.length);
 
         size_t current_block_index = 0;
         size_t i = 0;
+        size_t j = 0;
 
-        while (i < message_length)
+        while (i < message.length)
         {
-            size_t current_block_length = std::min((size_t)key.numeric_keyword[current_block_index], message_length - i);
+            size_t current_block_length = std::min((size_t)key.numeric_keyword[current_block_index], message.length - i);
             size_t in_block_index = current_block_length - 1;
 
             while ((s32)in_block_index >= 0)
@@ -77,19 +85,25 @@ namespace Bazeries
 
                 if (action == ENCRYPT)
                 {
-                    char ch_index = find_index(key.transposed_alphabet, *message, key.poly.dim * key.poly.dim);
-                    char ch = key.poly.table[ch_index];
-                    result[index] = ch;
+                    size_t ch_index = str_find_char_index(str_view(key.transposed_alphabet), message[j]);
+                    if (ch_index == -1)
+                    {
+                        report_error("Character %c not found in string %s", message[j], key.transposed_alphabet.chars);
+                    }
+                    result[index] = key.poly.table[ch_index];
                 }
                 else
                 {
-                    char ch_index = find_index(key.poly.table, *message, key.poly.dim * key.poly.dim);
-                    char ch = key.transposed_alphabet[ch_index];
-                    result[index] = ch;
+                    size_t ch_index = str_find_char_index(str_view(key.poly.table), message[j]);
+                    if (ch_index == -1)
+                    {
+                        report_error("Character %c not found in string %s", message[j], key.poly.table.chars);
+                    }
+                    result[index] = key.transposed_alphabet[ch_index];
                 }
 
                 in_block_index--;
-                message++;
+                j++;
             }
             i += current_block_length;
             current_block_index = (current_block_index + 1) % key.numeric_keyword.size();
@@ -98,12 +112,12 @@ namespace Bazeries
         return result;
     }
 
-    inline const char* encrypt(const char* message, const Key& key)
+    inline str_t encrypt(str_view_t message, const Key& key)
     {
         return xxcrypt(message, key, ENCRYPT);
     }
 
-    inline const char* decrypt(const char* encrypted, const Key& key)
+    inline str_t decrypt(str_view_t encrypted, const Key& key)
     {
         return xxcrypt(encrypted, key, DECRYPT);
     }

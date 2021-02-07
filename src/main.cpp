@@ -7,13 +7,13 @@
 #include "algos/shift.h"
 #include "algos/vigenere.h"
 #include "algos/bazeries.h"
-// #include <strlib.h>
+#include <strlib.h>
 
 int main()
 {
     {
-        const char* message = "CLOCKSWILLRUNMOREQUICKLYDURINGFREETIME";
-        const char* keyword = "MURPHY";
+        auto message = str_lit("CLOCKSWILLRUNMOREQUICKLYDURINGFREETIME");
+        auto keyword = str_lit("MURPHY");
         
         if (validate(keyword) != 0)
         {
@@ -30,41 +30,52 @@ int main()
         auto key = Playfair::make_key(5, keyword);
         Playfair::print_key(key);
 
-        printf("Initial message: %s\n", message);
+        printf("Initial message: %s\n", message.chars);
 
-        const char* encrypted = Playfair::encrypt(message, key);
-        printf("Encrypted message: %s\n", encrypted);
+        auto encrypted = Playfair::encrypt(message, key);
+        printf("Encrypted message: %s\n", encrypted.chars);
 
-        const char* decrypted = Playfair::decrypt(encrypted, key);
-        printf("Decrypted message: %s\n", decrypted);
+        auto decrypted = Playfair::decrypt(str_view(encrypted), key);
+        printf("Decrypted message: %s\n", decrypted.chars);
 
         str_free(encrypted); 
         str_free(decrypted);
     }
     {
-        const char* encrypted = "rkilusop";
-        const char* keyword = "martor";
+        auto encrypted = str_lit("rkilusop");
+        auto keyword =   str_lit("martor");
 
-        const char* encryption_key = Caesar::make_encryption_key(keyword);
-        const char* decryption_key = Caesar::make_decryption_key(encryption_key);
+        auto encryption_key = Caesar::make_encryption_key(keyword);
+        auto decryption_key = Caesar::make_decryption_key(str_view(encryption_key));
         
-        const char* decrypted = Caesar::decrypt(encrypted, decryption_key);
-        printf("Caesar: %s -> %s\n", encrypted, decrypted);
+        auto decrypted = Caesar::decrypt(encrypted, str_view(decryption_key));
+        printf("Caesar: %s -> %s\n", encrypted.chars, decrypted.chars);
 
         str_free(encryption_key);
         str_free(decryption_key);
         str_free(decrypted);
     }
     {
-        Affine::encrypt_and_decrypt_messages({ "the", "tree", "is", "a", "good", "hiding", "place" }, 7, 5); 
-        Affine::encrypt_and_decrypt_messages({ "hide", "the", "gold", "in", "the", "tree", "stump" }, 5, 8);
+        Affine::encrypt_and_decrypt_messages(
+        { 
+            str_lit("the"), str_lit("tree"), str_lit("is"), 
+            str_lit("a"), str_lit("good"), str_lit("hiding"), 
+            str_lit("place")
+        }, 7, 5); 
+
+        Affine::encrypt_and_decrypt_messages(
+        { 
+            str_lit("hide"), str_lit("the"), str_lit("gold"), 
+            str_lit("in"), str_lit("the"), str_lit("tree"), 
+            str_lit("stump")
+        }, 5, 8);
     }
     {
-        auto key = Straddling::make_key("MURPHY_", { 1, 3, 8 }, "PLAYWRIGHT");
+        auto key = Straddling::make_key(str_lit("MURPHY_"), { 1, 3, 8 }, str_lit("PLAYWRIGHT"));
         Straddling::print_key(key);
 
-        const char* message = "CLOCKS_WILL_RUN_MORE_QUICKLY_DURING_FREE_TIME";
-        printf("Original message:  %s\n", message);
+        auto message = str_lit("CLOCKS_WILL_RUN_MORE_QUICKLY_DURING_FREE_TIME");
+        printf("Original message:  %s\n", message.chars);
 
         auto encrypted = Straddling::encrypt(message, key);
         printf("Encrypted message: "); 
@@ -82,7 +93,7 @@ int main()
         printf("\n");
         
         auto decrypted = Straddling::decrypt(encrypted, key);
-        printf("Decrypted message: %s\n", decrypted);
+        printf("Decrypted message: %s\n", decrypted.chars);
 
         str_free(decrypted);
         Straddling::destroy_key(key);
@@ -90,45 +101,45 @@ int main()
     {
         Shift::Key key { {5, 1, 3, 0, 4, 2}, {2, 0, 3, 1, 4} };
 
-        const char* message = "NuLasaPeMaineCePotiFaceAzi";
-        printf("Original message:  %s\n", message);
+        auto message = str_lit("NuLasaPeMaineCePotiFaceAzi");
+        printf("Original message:  %s\n", message.chars);
 
-        const char* encrypted = Shift::encrypt(message, key);
-        printf("Encrypted message: %s\n", encrypted);
+        auto encrypted = Shift::encrypt(message, key);
+        printf("Encrypted message: %s\n", encrypted.chars);
 
-        const char* decrypted = Shift::decrypt(encrypted, key);
-        printf("Decrypted message: %s\n", decrypted);
+        auto decrypted = Shift::decrypt(str_view(encrypted), key);
+        printf("Decrypted message: %s\n", decrypted.chars);
         
         str_free(encrypted);
         str_free(decrypted);
         Shift::destroy_key(key);
     }
     {
-        Vigenere::Key key { "battista" };
+        Vigenere::Key key { str_lit("battista") };
 
-        const char* message = "asimpleexample";
-        printf("Original message:  %s\n", message);
+        auto message = str_lit("asimpleexample");
+        printf("Original message:  %s\n", message.chars);
 
-        const char* encrypted = Vigenere::encrypt(message, key);
-        printf("Encrypted message: %s\n", encrypted);
+        auto encrypted = Vigenere::encrypt(message, key);
+        printf("Encrypted message: %s\n", encrypted.chars);
 
-        const char* decrypted = Vigenere::decrypt(encrypted, key); 
-        printf("Decrypted message: %s\n", decrypted);
+        auto decrypted = Vigenere::decrypt(str_view(encrypted), key); 
+        printf("Decrypted message: %s\n", decrypted.chars);
 
         str_free(encrypted);
         str_free(decrypted);
     }
     {
-        auto key = Bazeries::make_key("SEVENTHOUSANDTHREEHUNDREDANDFIFTYTWO", { 7, 3, 5, 2 });
+        auto key = Bazeries::make_key(str_lit("SEVENTHOUSANDTHREEHUNDREDANDFIFTYTWO"), { 7, 3, 5, 2 });
 
-        const char* message = "ACLEARCONSCIENCEISUSUALLYTHESIGNOFABADMEMORY";
-        printf("Original message:  %s\n", message);
+        auto message = str_lit("ACLEARCONSCIENCEISUSUALLYTHESIGNOFABADMEMORY");
+        printf("Original message:  %s\n", message.chars);
 
-        const char* encrypted = Bazeries::encrypt(message, key);
-        printf("Encrypted message: %s\n", encrypted);
+        auto encrypted = Bazeries::encrypt(message, key);
+        printf("Encrypted message: %s\n", encrypted.chars);
 
-        const char* decrypted = Bazeries::decrypt(encrypted, key);
-        printf("Decrypted message: %s\n", decrypted);
+        auto decrypted = Bazeries::decrypt(str_view(encrypted), key);
+        printf("Decrypted message: %s\n", decrypted.chars);
 
         Bazeries::destroy_key(key);
         str_free(encrypted);

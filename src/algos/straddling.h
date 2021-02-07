@@ -35,10 +35,10 @@ namespace Straddling
     // TODO: clean memory of vectors.
     struct Make_Params
     {
-        const char* keyword; // not owned
+        str_view_t keyword; // not owned
         std::vector<size_t> order;
         std::vector<size_t> code_positions;
-        const char* char_set; // owned
+        str_t char_set; // owned
         size_t dim;
     };
 
@@ -53,7 +53,7 @@ namespace Straddling
     {
         if (i >= mp.dim || mp.order[i] >= mp.dim)
         {
-            report_error("Height limit of %zu exceeded. Character: %c, Position: %zu", mp.dim, *mp.char_set, i);
+            report_error("Height limit of %zu exceeded. Character: %c, Position: %zu", mp.dim, mp.char_set[i], i);
         }
     }
 
@@ -82,7 +82,7 @@ namespace Straddling
             i++; 
             error_if_over_limit_normal(mp, i);
         }
-        auto current_char_ptr = mp.char_set;
+        auto current_char_ptr = mp.char_set.chars;
         while (true)
         {
             key.encrypt_normal[*current_char_ptr] = { mp.order[i], mp.order[j] };
@@ -111,7 +111,7 @@ namespace Straddling
         return key;
     };
 
-    Key make_key(const char* keyword, const std::vector<size_t>& indices, const char* scramble)
+    Key make_key(str_view_t keyword, const std::vector<size_t>& indices, str_view_t scramble)
     {
         Make_Params mp;
         mp.keyword = keyword;                                   // not owned
@@ -160,61 +160,58 @@ namespace Straddling
         }
     }
 
-    std::vector<size_t> encrypt(const char* message, const Key& key)
+    std::vector<size_t> encrypt(str_view_t message, const Key& key)
     {
         std::vector<size_t> encrypted_message;
-        while (*message != 0)
+        for (int i = 0; i < message.length; i++)
         {
-            if (in_map(key.encrypt_header, *message))
+            if (in_map(key.encrypt_header, message[i]))
             {
-                encrypted_message.push_back(key.encrypt_header.at(*message));
+                encrypted_message.push_back(key.encrypt_header.at(message[i]));
             }
-            else if (in_map(key.encrypt_normal, *message))
+            else if (in_map(key.encrypt_normal, message[i]))
             {
-                auto val = key.encrypt_normal.at(*message);
+                auto val = key.encrypt_normal.at(message[i]);
                 encrypted_message.push_back(val.first);
                 encrypted_message.push_back(val.second);
             }
             else
             {
-                report_error("The character %c is not present in the dictionary.", *message);
+                report_error("The character %c is not present in the dictionary.", message[i]);
             }
-            message++;
         }
         return std::move(encrypted_message);
     }
 
-    const char* decrypt(const std::vector<size_t>& encrypted_message, const Key& key)
+    str_t decrypt(const std::vector<size_t>& encrypted_message, const Key& key)
     {
-        char* decrypted_message = (char*) malloc(encrypted_message.size());
-        char* current = decrypted_message;
+        str_builder_t decrypted = strb_create(encrypted_message.size());
         size_t i = 0;
+
         while (i < encrypted_message.size())
         {
             size_t index;
             if (in_map(key.decrypt_header, encrypted_message[i]))
             {
-                *current = key.decrypt_header.at(encrypted_message[i]);
+                strb_chr(decrypted, key.decrypt_header.at(encrypted_message[i]));
             }
             else 
             {
                 Normal_Encrypted_Value encrypted_key = { encrypted_message[i], encrypted_message[i + 1] };   
                 if (in_map(key.decrypt_normal, encrypted_key))
                 {
-                    *current = key.decrypt_normal.at(encrypted_key);
+                    strb_chr(decrypted, key.decrypt_normal.at(encrypted_key));
                     i++;
                 }
                 else
                 {
                     report_error("The encrypted combination (%i, %i) is not present in the dictionary.",
                         encrypted_key.first, encrypted_key.second);
-                    return NULL;
+                    return STR_NULL;
                 }
             }
             i++;
-            current++;
         }
-        *current = 0;
-        return decrypted_message;
+        return strb_build(decrypted);
     }
 }

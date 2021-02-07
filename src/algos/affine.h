@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <mydefines.h>
+#include <strlib.h>
 #include "../shared.h"
 
 namespace Affine
@@ -17,29 +18,25 @@ namespace Affine
         char a_inv;
     };
 
-    const char* encrypt(const char* message, Key key)
+    str_t encrypt(str_view_t message, Key key)
     {
-        size_t len = strlen(message);
-        char* encrypted_message = (char*) malloc(len + 1);
-        for (size_t i = 0; i < len; i++)
+        str_t encrypted_message = str_make(message.length);
+        for (size_t i = 0; i < message.length; i++)
         {
             char mod = ((message[i] - FIRST_CHARACTER) * key.a + key.b) % LATIN_LENGTH;
             encrypted_message[i] = mod + FIRST_CHARACTER;
         }
-        encrypted_message[len] = 0;
         return encrypted_message;
     }
 
-    const char* decrypt(const char* encrypted_message, Key key)
+    str_t decrypt(str_view_t encrypted_message, Key key)
     {
-        size_t len = strlen(encrypted_message);
-        char* decrypted_message = (char*) malloc(len + 1);
-        for (size_t i = 0; i < len; i++)
+        str_t decrypted_message = str_make(encrypted_message.length);
+        for (size_t i = 0; i < encrypted_message.length; i++)
         {
-            char mod = ((encrypted_message[i] - FIRST_CHARACTER - key.b + LATIN_LENGTH) * key.a_inv) % LATIN_LENGTH;
+            char mod = ((decrypted_message[i] - FIRST_CHARACTER - key.b + LATIN_LENGTH) * key.a_inv) % LATIN_LENGTH;
             decrypted_message[i] = mod + FIRST_CHARACTER;
         }
-        decrypted_message[len] = 0;
         return decrypted_message;
     }
 
@@ -58,15 +55,15 @@ namespace Affine
         return key;
     }
 
-    void encrypt_and_decrypt_messages(const std::vector<const char*>& messages, char a, char b)
+    void encrypt_and_decrypt_messages(const std::vector<str_view_t>& messages, char a, char b)
     {
         auto key = make_key(a, b);
 
         for (auto m : messages)
         {
             auto encrypted = encrypt(m, key);
-            auto decrypted = decrypt(encrypted, key);
-            printf("%s -> %s -> %s\n", m, encrypted, decrypted);
+            auto decrypted = decrypt(str_view(encrypted), key);
+            printf("%s -> %s -> %s\n", m.chars, encrypted.chars, decrypted.chars);
             str_free(encrypted); 
             str_free(decrypted);
         }

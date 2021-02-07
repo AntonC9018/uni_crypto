@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <algorithm>
+#include <strlib.h>
 
 #define FIRST_CHARACTER 'a'
 #define LAST_CHARACTER 'z'
@@ -8,9 +9,9 @@
 
 #define in_map(map, key) map.find((key)) != map.end()
 
-const char* latin = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const char* latin_numbers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-const char* latin_numbers_underscore = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+str_view_t latin = str_lit("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+str_view_t latin_numbers = str_lit("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+str_view_t latin_numbers_underscore = str_lit("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
 
 // Removes all occurences of a character after it has been met
 void prune_string(char* dest, const char* src)
@@ -78,35 +79,32 @@ int inverse_modulo(int a, int m0)
 
 // This function validates the message/keyword against the given alphabet.
 // Returns a pointer to the problematic character.
-const char* validate(const char* m, const char* alphabet = latin)
+const char* validate(str_view_t m, str_view_t alphabet = latin)
 {
-    while(*m != 0)
+    for (size_t i = 0; i < m.length; i++)
     {
-        if (strchr(alphabet, *m) == 0)
+        if (!str_has_char(alphabet, m[i]))
         {
-            return m;
+            return &m.chars[i];
         }
-        m++;
     }
     return 0;
 }
 
-const char* alphabet_without_keyword(
-    const char* keyword, const char* alphabet = latin_numbers_underscore)
+str_t alphabet_without_keyword(str_view_t keyword, 
+                               str_view_t alphabet = latin_numbers_underscore)
 {
-    char* result = (char*) malloc(strlen(alphabet) + 1);
+    str_builder_t result = strb_create(alphabet.length);
     size_t i = 0;
-    while (*alphabet != 0)
+
+    for (size_t j = 0; j < alphabet.length; j++)
     {
-        if (strchr(keyword, *alphabet) == 0)
+        if (!str_has_char(keyword, alphabet[j]))
         {
-            result[i] = *alphabet;
-            i++;
+            strb_chr(result, alphabet[j]);
         }
-        *alphabet++;                
     }
-    result[i] = '\0';
-    return result;
+    return strb_build(result);
 }
 
 inline bool contains(const std::vector<size_t>& v, size_t item)
@@ -123,22 +121,23 @@ inline bool contains(const std::vector<size_t>& v, size_t item)
 
 struct Thing { size_t index; size_t value; };
 
-std::vector<size_t> arrange(const char* string, const char* alphabet = latin_numbers_underscore)
+std::vector<size_t> arrange(str_view_t string, str_view_t alphabet = latin_numbers_underscore)
 {
-    std::vector<size_t> result;
     std::vector<Thing> things;
-    while (*string != 0)
+    std::vector<size_t> result;
+
+    for (size_t i = 0; i < string.length; i++)
     {
-        size_t pos = (size_t)strchr(alphabet, *string);
-        if (!contains(result, pos))
+        size_t char_index = str_find_char_index(alphabet, string[i]);
+        if (!contains(result, char_index))
         {
-            result.push_back(pos);
-            things.push_back({ things.size(), pos });
+            result.push_back(char_index);
+            things.push_back({ things.size(), char_index });
         }
-        string++;
     }
     sort(things.begin(), things.end(), [](auto a, auto b) { return a.value < b.value; });
-    for (size_t i = 0; i < result.size(); i++)
+
+    for (size_t i = 0; i < things.size(); i++)
     {
         result[i] = things[i].index;
     }
@@ -159,26 +158,21 @@ std::vector<size_t> without(const std::vector<size_t>& order, const std::vector<
     return std::move(result);
 }
 
-const char* leave_unique(const char* but, const char* all)
+str_t leave_unique(str_view_t but, str_view_t all)
 {
     // TODO: validate the first parameter (all characters from it should be contained within the second)
-    char* result = (char*) malloc(strlen(all) + 1);
-    size_t i = 0;
-    while (but[i] != 0)
+    str_t result = str_make(all.length);
+    memcpy(result.chars, but.chars, but.length);
+
+    size_t i = but.length;
+    for (size_t j = 0; j < all.length; j++)
     {
-        result[i] = but[i];
-        i++;
-    }
-    while (*all != 0)
-    {
-        if (strchr(but, *all) == 0)
+        if (!str_has_char(but, all[j]))
         {
-            result[i] = *all;
+            result[i] = all[j];
             i++;
         }
-        all++;
     }
-    result[i] = 0;
     return result;
 }
 
@@ -193,15 +187,3 @@ size_t find_index(const std::vector<size_t>& v, size_t item)
     }
     return -1;
 } 
-
-char find_index(const char* any_string, char it, size_t element_count)
-{
-    for (size_t i = 0; i < element_count; i++)
-    {
-        if (any_string[i] == it)
-        {
-            return i;
-        }
-    }
-    return -1;
-}

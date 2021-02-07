@@ -13,38 +13,35 @@ namespace Vigenere
 {
     struct Key
     {
-        const char* keyword;
+        str_view_t keyword;
     };
 
     // We assume only plain lower case latin letters are used
-    internal const char* xxcrypt(const char* message, const Key& key, Crypto_Action action)
+    internal str_t xxcrypt(str_view_t message, const Key& key, Crypto_Action action)
     {
-        size_t message_length = strlen(message);
-        char* result = (char*) malloc(message_length + 1);
-        result[message_length] = 0;
+        str_t result = str_make(message.length);
+        size_t j = 0;
 
-        const char* keyword = key.keyword;
-
-        for (size_t i = 0; i < message_length; i++)
+        for (size_t i = 0; i < message.length; i++)
         {
-            result[i] = ((message[i] - FIRST_CHARACTER) + action * (*keyword - FIRST_CHARACTER) + LATIN_LENGTH)
-                % LATIN_LENGTH + FIRST_CHARACTER;
-            keyword++;
-            if (*keyword == 0)
+            result[i] = ((message[i] - FIRST_CHARACTER) + action * (key.keyword[j] - FIRST_CHARACTER) + LATIN_LENGTH) % LATIN_LENGTH + FIRST_CHARACTER;
+
+            j++;
+            if (j == key.keyword.length) 
             {
-                keyword = key.keyword;
+                j = 0;
             }
         }
 
         return result;
     }
 
-    inline const char* encrypt(const char* message, const Key& key)
+    inline str_t encrypt(str_view_t message, const Key& key)
     {
         return xxcrypt(message, key, ENCRYPT);
     }
 
-    inline const char* decrypt(const char* encrypted, const Key& key)
+    inline str_t decrypt(str_view_t encrypted, const Key& key)
     {
         return xxcrypt(encrypted, key, DECRYPT);
     }
