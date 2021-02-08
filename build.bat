@@ -1,6 +1,6 @@
 @echo off
 
-"D:/msys64/mingw64/bin/g++.exe" -std=c++17 ^
+"D:/msys64/mingw64/bin/g++.exe" -std=c++17 -pthread^
  ./src/*.cpp ./src/gui/*.cpp ./src/algos/*.cpp ./third_party/strlib/strlib.cpp ^
  -Ithird_party -Ithird_party/mydefines -Ithird_party/strlib -I../includes ^
  -ID:/msys64/mingw64/include/gtkmm-3.0 ^

@@ -2,53 +2,42 @@
 
 namespace Straddling
 {
-    Key make_key(const Make_Params& mp)
+    Key make_key(
+        str_view_t keyword,
+        const std::vector<size_t>& order,
+        const std::vector<size_t>& row_indices,
+        str_view_t char_set,
+        size_t dim
+    )
     {
+        auto code_positions = without(order, row_indices);
         Key key;
+
+        for (size_t i = 0; i < code_positions.size(); i++)
         {
-            size_t i = 0;
-            while (mp.keyword[i] != 0)
+            if (code_positions[i] >= dim)
             {
-                if (mp.code_positions[i] >= mp.dim)
+                report_error("Height limit of %i exceeded", dim);
+            }
+            key.encrypt_header[keyword[i]] = { code_positions[i] };
+            key.decrypt_header[{ code_positions[i] }] = keyword[i];
+        }
+
+        size_t col = 0;
+        size_t index = 0;
+
+        for (size_t row : row_indices)
+        {
+            for (size_t col = 0; col < dim; col++)
+            {
+                if (char_set[index] == 0)
                 {
-                    report_error("Height limit of %i exceeded", mp.dim);
+                    report_error("Yikes, the char_set is not valid");
                 }
-                key.encrypt_header[mp.keyword[i]] = { mp.code_positions[i] };
-                key.decrypt_header[{ mp.code_positions[i] }] = mp.keyword[i];
-                i++;
-            }
-        }
 
-        size_t i = 0;
-        size_t j = 0;
-        while (in_map(key.decrypt_header, mp.order[i]))
-        {
-            i++; 
-            error_if_over_limit_normal(mp, i);
-        }
-        auto current_char_ptr = mp.char_set.chars;
-        while (true)
-        {
-            key.encrypt_normal[*current_char_ptr] = { mp.order[i], mp.order[j] };
-            key.decrypt_normal[{ mp.order[i], mp.order[j] }] = *current_char_ptr;
-            current_char_ptr++;
-            j++;
-
-            if (*current_char_ptr == 0)
-            {
-                break;
-            }
-
-            if (j == mp.dim)
-            {
-                j = 0;
-                do
-                {
-                    i++; 
-                    error_if_over_limit_normal(mp, i); 
-                    error_if_over_limit_normal(mp, j);
-                } 
-                while (in_map(key.decrypt_header, mp.order[i]));
+                key.encrypt_normal[char_set[index]] = { row, order[col] };
+                key.decrypt_normal[{ row, order[col] }] = char_set[index];
+                index++;
             }
         }
 
@@ -57,15 +46,15 @@ namespace Straddling
 
     Key make_key(str_view_t keyword, const std::vector<size_t>& indices, str_view_t scramble)
     {
-        Make_Params mp;
-        mp.keyword = keyword;                                   // not owned
-        mp.char_set = alphabet_without_keyword(keyword);        // owned
-        mp.order = arrange(scramble, latin_numbers_underscore); // owned
-        mp.code_positions = without(mp.order, indices);         // owned
-        mp.dim = 10;
-
-        Key key = make_key(mp);
-        destroy_params(&mp);
+        auto char_set = alphabet_without_keyword(keyword);
+        Key key = make_key(
+            keyword, 
+            arrange(scramble, latin_numbers_underscore), 
+            indices, 
+            str_view(char_set), 
+            10
+        );
+        str_free(char_set);
         return key;
     }
 

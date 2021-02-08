@@ -25,31 +25,36 @@ namespace Straddling
         std::map<Normal_Encrypted_Value, char> decrypt_normal;
     };
 
-    struct Make_Params
-    {
-        str_view_t keyword; // not owned
-        std::vector<size_t> order;
-        std::vector<size_t> code_positions;
-        str_t char_set; // owned
-        size_t dim;
-    };
+    // struct Make_Params
+    // {
+    //     str_view_t keyword; // not owned
+    //     std::vector<size_t> order;
+    //     std::vector<size_t> row_indices;
+    //     str_t char_set; // owned
+    //     size_t dim;
+    // };
 
-    inline void destroy_params(Make_Params* mp)
-    {
-        str_free(mp->char_set);
-        mp->order.clear();
-        mp->code_positions.clear();
-    }
+    // inline void destroy_params(Make_Params* mp)
+    // {
+    //     str_free(mp->char_set);
+    //     mp->order.clear();
+    //     mp->row_indices.clear();
+    // }
 
-    inline void error_if_over_limit_normal(Make_Params mp, size_t i)
-    {
-        if (i >= mp.dim || mp.order[i] >= mp.dim)
-        {
-            report_error("Height limit of %zu exceeded. Character: %c, Position: %zu", mp.dim, mp.char_set[i], i);
-        }
-    }
+    // inline void error_if_over_limit_normal(Make_Params mp, size_t i)
+    // {
+    //     if (i >= mp.dim || mp.order[i] >= mp.dim)
+    //     {
+    //         report_error("Height limit of %zu exceeded. Character: %c, Position: %zu", mp.dim, mp.char_set[i], i);
+    //     }
+    // }
 
-    Key make_key(const Make_Params& mp);
+    Key make_key(str_view_t keyword,
+        const std::vector<size_t>& order,
+        const std::vector<size_t>& row_indices,
+        str_view_t char_set,
+        size_t dim
+    );
 
     Key make_key(str_view_t keyword, const std::vector<size_t>& indices, str_view_t scramble);
 

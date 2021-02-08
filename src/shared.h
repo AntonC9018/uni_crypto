@@ -13,6 +13,11 @@ extern str_view_t latin;
 extern str_view_t latin_numbers;
 extern str_view_t latin_numbers_underscore;
 
+inline bool is_digit(char ch)
+{
+    return ch >= '0' && ch <= '9';
+}
+
 // Removes all occurences of a character after it has been met
 void prune_string(char* dest, const char* src);
 

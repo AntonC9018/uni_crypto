@@ -62,11 +62,13 @@ ShiftBox::ShiftBox()
 
     m_RowPermLable.set_text("Row Permutation");
     m_RowPermEntry.set_text("624153");
-    m_RowPermEntry.signal_changed().connect(sigc::bind(perm_entry_functor, &m_RowPermEntry, m_HeightAdjustment.get()));
+    m_RowPermEntry.signal_changed().connect(
+        sigc::bind(perm_entry_functor, &m_RowPermEntry, m_HeightAdjustment.get()));
 
     m_ColPermLable.set_text("Col Permutation");
     m_ColPermEntry.set_text("31425");
-    m_ColPermEntry.signal_changed().connect(sigc::bind(perm_entry_functor, &m_ColPermEntry, m_WidthAdjustment.get()));
+    m_ColPermEntry.signal_changed().connect(
+        sigc::bind(perm_entry_functor, &m_ColPermEntry, m_WidthAdjustment.get()));
 
 
     m_UsageHeader.set_markup("<u><b>Usage</b></u>");

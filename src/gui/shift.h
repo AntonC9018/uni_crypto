@@ -1,3 +1,4 @@
+#pragma once
 #include <gtkmm/box.h>
 #include <gtkmm/grid.h>
 #include <gtkmm/adjustment.h>
