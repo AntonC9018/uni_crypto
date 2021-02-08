@@ -107,8 +107,6 @@ ShiftBox::ShiftBox()
     perm_entry_changed(&m_ColPermEntry, m_WidthAdjustment.get());
     m_ignoreTextInput = false;
     perm_entry_changed(&m_RowPermEntry, m_HeightAdjustment.get());
-
-    resize_grids();
 }
 
 
@@ -208,7 +206,7 @@ static void attach_row_col_labels_perm(const Shift::Key& key, Gtk::Grid& parent,
     }
 }
 
-static void resize_grid(Gtk::Grid& parent, const Glib::ustring& str, size_t width, size_t height)
+static void resize_grid_normal(Gtk::Grid& parent, const Glib::ustring& str, size_t width, size_t height)
 {
     parent.forall(sigc::ptr_fun(remove_widget));
 
@@ -224,14 +222,30 @@ static void resize_grid(Gtk::Grid& parent, const Glib::ustring& str, size_t widt
     }
 }
 
+static void resize_grid_perm(Gtk::Grid& parent, const Glib::ustring& str, size_t width, size_t height)
+{
+    parent.forall(sigc::ptr_fun(remove_widget));
+
+    size_t index = 0;
+    for (size_t col = 0; col < width; col++)
+    {
+        for (size_t row = 0; row < height; row++, index++)
+        {
+            attach_label(
+                index < str.size() ? str[index] : ' ', 
+                col + 1, row + 1, parent); 
+        }
+    }
+}
+
 void ShiftBox::resize_grids()
 {
     size_t width =  m_key.col_perm.size();
     size_t height = m_key.row_perm.size();
 
-    resize_grid(m_PlainGrid, m_refPlainTextBuffer->get_text(), width, height);
+    resize_grid_normal(m_PlainGrid, m_refPlainTextBuffer->get_text(), width, height);
     attach_row_col_labels_perm(m_key, m_PlainGrid, width, height);
-    resize_grid(m_EncryptedGrid, m_refEncryptedTextBuffer->get_text(), width, height);
+    resize_grid_perm(m_EncryptedGrid, m_refEncryptedTextBuffer->get_text(), width, height);
     attach_row_col_labels_normal(m_EncryptedGrid, width, height);
 }
 
@@ -261,6 +275,7 @@ void ShiftBox::do_crypto(Gtk::TextBuffer* text_buffer)
         sprintf(buffer, "Chars left: %zu", Shift::max_message_size(m_key) - message_size);
         m_CharsLeftLabel.set_text(buffer);
     }
+    resize_grids();
 }
 
 void ShiftBox::add_error()

@@ -26,7 +26,8 @@ namespace Shift
         {
             for (size_t col = 0; col < key.col_perm.size(); col++, index++)
             {
-                encrypted[key.row_perm[row] * key.col_perm.size() + key.col_perm[col]] = message[index];
+                // Also transpose them
+                encrypted[key.row_perm[row] + key.col_perm[col] * key.row_perm.size()] = message[index];
 
                 if (index == message.length - 1)
                     return encrypted;
@@ -50,9 +51,9 @@ namespace Shift
         }
 
         size_t index = 0;
-        for (size_t row = 0; row < key.row_perm.size(); row++)
+        for (size_t col = 0; col < key.col_perm.size(); col++)
         {
-            for (size_t col = 0; col < key.col_perm.size(); col++, index++)
+            for (size_t row = 0; row < key.row_perm.size(); row++, index++)
             {
                 // Find the row and the column indices in the key
                 size_t new_row = find_index(key.row_perm, row);
