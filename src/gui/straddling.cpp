@@ -345,9 +345,9 @@ void StraddlingBox::do_crypto(Gtk::TextBuffer* text_buffer)
         else if (text_buffer == m_refEncryptedTextBuffer.get())
         {
             // TODO:
-            str_t decrypted = Straddling::decrypt(message, m_key);
-            m_refPlainTextBuffer->set_text(decrypted.chars);
-            str_free(decrypted);
+            // str_t decrypted = Straddling::decrypt(message, m_key);
+            // m_refPlainTextBuffer->set_text(decrypted.chars);
+            // str_free(decrypted);
         }
     }
     m_ignoreAnyInput = false;
