@@ -111,15 +111,10 @@ StraddlingBox::StraddlingBox()
 
     m_ignoreAnyInput = true;
     refresh_alphabet();
-    puts("refresh_keyword");
     refresh_keyword();
-    puts("refresh_scramble");
     refresh_scramble();
-    puts("refresh_row_indices");
     refresh_row_indices();
-    puts("refresh_charset");
     refresh_charset();
-    puts("refresh_order");
     refresh_order();
     do_crypto(m_refPlainTextBuffer.get());
 }
@@ -385,9 +380,13 @@ void StraddlingBox::recreate_grid()
         attach_label((char)m_row_indices[i] + '0', 0, i + 2, m_TableGrid);
     }
 
-    for (const auto& [ch, index] : m_key.encrypt_normal)
+    for (size_t i = 0; i < m_row_indices.size(); i++)
     {
-        size_t row = find_index(m_row_indices, index.first);
-        attach_label(ch, index.second + 1, row + 2, m_TableGrid);
+        size_t row = m_row_indices[i];
+
+        for (size_t col = 0; col < 10; col++)
+        {
+            attach_label(m_key.decrypt_normal[{row, col}], col + 1, i + 2, m_TableGrid);
+        }
     }
 }
