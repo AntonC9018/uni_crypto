@@ -8,12 +8,13 @@
 #include <map>
 
 #include "../shared.h"
+#include "../logger.h"
 
 
 namespace Straddling
 {
-    typedef size_t Header_Encrypted_Value;
-    typedef std::pair<size_t, size_t> Normal_Encrypted_Value;
+    typedef char Header_Encrypted_Value;
+    typedef std::pair<char, char> Normal_Encrypted_Value;
 
     struct Key
     {
@@ -62,7 +63,7 @@ namespace Straddling
 
     void print_key(Key key);
 
-    std::vector<size_t> encrypt(str_view_t message, const Key& key);
+    std::vector<char> encrypt(str_view_t message, const Key& key, Logger& logger);
 
-    str_t decrypt(const std::vector<size_t>& encrypted_message, const Key& key);
+    str_t decrypt(const std::vector<char>& encrypted_message, const Key& key, Logger& logger);
 }

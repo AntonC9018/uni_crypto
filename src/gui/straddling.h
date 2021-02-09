@@ -30,16 +30,22 @@ private:
     // Whether can generate
     bool m_valid = false;
     bool m_ignoreAnyInput = false;
+    // Display setting: group size
+    bool m_show_in_groups = true;
+    size_t m_group_size = 5;
 
     Straddling::Key m_key = {};
 
     bool validate();    
 
-    void keyword_changed();     // -> keyword, charset
-    void scramble_changed();    // -> order
-    void row_indices_changed(); // -> row_indices
+    void changed_keyword();     // -> keyword, charset
+    void changed_scramble();    // -> order
+    void changed_row_indices(); // -> row_indices
     // Note that the influence -> charset is satisfied transitively through keyword
-    void alphabet_changed();    // :: keyword, scramble -> order; 
+    void changed_alphabet();    // :: keyword, scramble -> order; 
+    void changed_text(Gtk::TextBuffer* text_buffer);    // :: keyword, scramble -> order; 
+    void changed_show();
+    void changed_group_size();
 
     void refresh_alphabet();
     void refresh_keyword();     // alphabet -> keyword

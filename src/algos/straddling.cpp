@@ -19,8 +19,8 @@ namespace Straddling
             {
                 report_error("Height limit of %i exceeded", dim);
             }
-            key.encrypt_header[keyword[i]] = { code_positions[i] };
-            key.decrypt_header[{ code_positions[i] }] = keyword[i];
+            key.encrypt_header[keyword[i]] = { (char)code_positions[i] };
+            key.decrypt_header[{ (char)code_positions[i] }] = keyword[i];
         }
 
         size_t col = 0;
@@ -93,9 +93,9 @@ namespace Straddling
         }
     }
 
-    std::vector<size_t> encrypt(str_view_t message, const Key& key)
+    std::vector<char> encrypt(str_view_t message, const Key& key, Logger& logger)
     {
-        std::vector<size_t> encrypted_message;
+        std::vector<char> encrypted_message;
         for (int i = 0; i < message.length; i++)
         {
             if (in_map(key.encrypt_header, message[i]))
@@ -105,18 +105,19 @@ namespace Straddling
             else if (in_map(key.encrypt_normal, message[i]))
             {
                 auto val = key.encrypt_normal.at(message[i]);
-                encrypted_message.push_back(val.first);
-                encrypted_message.push_back(val.second);
+                encrypted_message.push_back((char)val.first);
+                encrypted_message.push_back((char)val.second);
             }
             else
             {
-                report_error("The character %c is not present in the dictionary.", message[i]);
+                logger_add_error(logger, "The character %c is not present in the dictionary.\n", message[i]);
+                return std::move(encrypted_message);
             }
         }
         return std::move(encrypted_message);
     }
 
-    str_t decrypt(const std::vector<size_t>& encrypted_message, const Key& key)
+    str_t decrypt(const std::vector<char>& encrypted_message, const Key& key, Logger& logger)
     {
         str_builder_t decrypted = strb_make(encrypted_message.size());
         size_t i = 0;
@@ -130,6 +131,12 @@ namespace Straddling
             }
             else 
             {
+                if (i + 1 >= encrypted_message.size())
+                {
+                    logger_add_error(logger, "The enrypted message is not the right length.\n");
+                    strb_free(decrypted);
+                    return STR_NULL;
+                }
                 Normal_Encrypted_Value encrypted_key = { encrypted_message[i], encrypted_message[i + 1] };   
                 if (in_map(key.decrypt_normal, encrypted_key))
                 {
@@ -138,8 +145,9 @@ namespace Straddling
                 }
                 else
                 {
-                    report_error("The encrypted combination (%i, %i) is not present in the dictionary.",
-                        encrypted_key.first, encrypted_key.second);
+                    logger_add_error(logger, "The encrypted combination (%i, %i) is not present in the dictionary.\n",
+                        (int)encrypted_key.first, (int)encrypted_key.second);
+                    strb_free(decrypted);
                     return STR_NULL;
                 }
             }

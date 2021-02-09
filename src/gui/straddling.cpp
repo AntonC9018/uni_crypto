@@ -53,25 +53,25 @@ StraddlingBox::StraddlingBox()
     m_AlphabetCombo.append(latin_numbers_underscore.chars);
     m_AlphabetCombo.set_active(1);
     m_AlphabetCombo.signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::alphabet_changed)
+        sigc::mem_fun(*this, StraddlingBox::changed_alphabet)
     );
 
     m_RowIndicesLabel.set_text("Row Indices");
     m_RowIndicesEntry.set_text("138");
     m_RowIndicesEntry.signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::row_indices_changed)
+        sigc::mem_fun(*this, StraddlingBox::changed_row_indices)
     );
 
     m_ScrambleLabel.set_text("Scramble Word");
     m_ScrambleEntry.set_text("PLAYWRIGHT");
     m_ScrambleEntry.signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::scramble_changed)
+        sigc::mem_fun(*this, StraddlingBox::changed_scramble)
     );
 
     m_KeywordLabel.set_text("Keyword");
     m_KeywordEntry.set_text("MURPHY_");
     m_KeywordEntry.signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::keyword_changed)
+        sigc::mem_fun(*this, StraddlingBox::changed_keyword)
     );
 
     m_UsageHeader.set_markup("<u><b>Usage</b></u>");
@@ -79,7 +79,7 @@ StraddlingBox::StraddlingBox()
     m_UsageHeader.set_margin_bottom(10);
     m_UsageHeader.set_size_request(400);
 
-    auto text_changed_functor = sigc::mem_fun(*this, StraddlingBox::do_crypto); 
+    auto text_changed_functor = sigc::mem_fun(*this, StraddlingBox::changed_text); 
 
     m_PlainTextLabel.set_text("Plain Message");
     m_refPlainTextBuffer = Gtk::TextBuffer::create();
@@ -100,8 +100,17 @@ StraddlingBox::StraddlingBox()
 
     m_refGroupLengthAdjustment = Gtk::Adjustment::create(5, 1, 10, 1, 1, 0);
     m_EncryptedDisplay_GroupLengthButton.set_adjustment(m_refGroupLengthAdjustment);
+    m_EncryptedDisplay_GroupLengthButton.signal_changed().connect(
+        sigc::mem_fun(*this, StraddlingBox::changed_group_size)
+    );
 
-    m_EncryptedDisplay_GroupsButton.join_group(m_EncryptedDisplay_ConcatenateButton);
+    m_EncryptedDisplay_ConcatenateButton.join_group(m_EncryptedDisplay_GroupsButton);
+    m_EncryptedDisplay_GroupsButton.signal_clicked().connect(
+        sigc::mem_fun(*this, StraddlingBox::changed_show)
+    );
+    m_EncryptedDisplay_ConcatenateButton.signal_clicked().connect(
+        sigc::mem_fun(*this, StraddlingBox::changed_show)
+    );
 
     m_TableGrid.set_row_homogeneous(true);
     m_TableGrid.set_column_homogeneous(true);
@@ -116,10 +125,11 @@ StraddlingBox::StraddlingBox()
     refresh_row_indices();
     refresh_charset();
     refresh_order();
+    make_key();
     do_crypto(m_refPlainTextBuffer.get());
 }
 
-void StraddlingBox::alphabet_changed()
+void StraddlingBox::changed_alphabet()
 {
     if (!m_ignoreAnyInput)
     {
@@ -129,41 +139,80 @@ void StraddlingBox::alphabet_changed()
         refresh_scramble();     // Remove characters not in the alphabet from the scramble.
         refresh_order();        // Satisfy the transitive dependency scramble -> order.
         refresh_charset();      // Satisfy the transitive and direct dependency alphabet -> (keyword) -> charset
+        make_key();
         do_crypto(m_refPlainTextBuffer.get());
     }
 }
 
-void StraddlingBox::keyword_changed()
+void StraddlingBox::changed_keyword()
 {
     if (!m_ignoreAnyInput)
     {
         m_ignoreAnyInput = true;
         refresh_keyword();      // Remove characters not in alphabet from the keyword.
         refresh_charset();      // Satisfy the dependency keyword -> charset
+        make_key();
         do_crypto(m_refPlainTextBuffer.get());
     }
 }
 
-void StraddlingBox::scramble_changed()
+void StraddlingBox::changed_scramble()
 {
     if (!m_ignoreAnyInput)
     {
         m_ignoreAnyInput = true;
         refresh_scramble();
         refresh_order();
+        make_key();
         do_crypto(m_refPlainTextBuffer.get());
     }
 }
 
-void StraddlingBox::row_indices_changed()
+void StraddlingBox::changed_row_indices()
 {
     if (!m_ignoreAnyInput)
     {
         m_ignoreAnyInput = true;
         refresh_row_indices();
+        make_key();
         do_crypto(m_refPlainTextBuffer.get());
     }
 }
+
+void StraddlingBox::changed_text(Gtk::TextBuffer* text_buffer)
+{
+    if (!m_ignoreAnyInput)
+    {
+        m_ignoreAnyInput = true;
+        do_crypto(text_buffer);
+    }
+}
+
+void StraddlingBox::changed_show()
+{
+    m_show_in_groups = m_EncryptedDisplay_GroupsButton.get_active();
+    if (!m_ignoreAnyInput)
+    {
+        m_ignoreAnyInput = true;
+        make_key();
+        do_crypto(m_refPlainTextBuffer.get());
+    }
+}
+
+void StraddlingBox::changed_group_size()
+{
+    m_group_size = (size_t) m_refGroupLengthAdjustment->get_value();
+    if (m_show_in_groups)
+    {
+        if (!m_ignoreAnyInput)
+        {
+            m_ignoreAnyInput = true;
+            make_key();
+            do_crypto(m_refPlainTextBuffer.get());
+        }
+    }
+}
+
 
 void StraddlingBox::refresh_alphabet()
 {
@@ -324,7 +373,6 @@ void StraddlingBox::make_key()
 
 void StraddlingBox::do_crypto(Gtk::TextBuffer* text_buffer)
 {
-    make_key();
     if (m_valid) 
     {
         auto gtk_message = text_buffer->get_text();
@@ -333,16 +381,57 @@ void StraddlingBox::do_crypto(Gtk::TextBuffer* text_buffer)
 
         if (text_buffer == m_refPlainTextBuffer.get())
         {
-            // auto encrypted = Straddling::encrypt(message, m_key);
-            // m_refEncryptedTextBuffer->set_text(encrypted);
-            // str_free(encrypted);
+            auto logger = make_logger();
+            auto encrypted = Straddling::encrypt(message, m_key, logger);
+            if (!logger.has_errors)
+            {
+                if (m_show_in_groups)
+                {
+                    str_builder_t sb = strb_make();
+                    for (size_t i = 0; i < encrypted.size(); i++)
+                    {
+                        strb_chr(sb, encrypted[i] + '0');
+                        if (i % m_group_size == m_group_size - 1)
+                        {
+                            strb_chr(sb, ' ');
+                        }
+                    }
+                    m_refEncryptedTextBuffer->set_text({ strb_build(sb).chars });
+                    strb_free(sb);
+                }
+                else
+                {
+                    for (size_t i = 0; i < encrypted.size(); i++)
+                        encrypted[i] = encrypted[i] + '0';
+
+                    m_refEncryptedTextBuffer->set_text({ encrypted.begin(), encrypted.end() });
+                }
+            }
         }  
         else if (text_buffer == m_refEncryptedTextBuffer.get())
         {
-            // TODO:
-            // str_t decrypted = Straddling::decrypt(message, m_key);
-            // m_refPlainTextBuffer->set_text(decrypted.chars);
-            // str_free(decrypted);
+            std::vector<char> encrypted_filtered;
+            encrypted_filtered.reserve(message.length);
+            // Filter out the ' '
+            for (size_t i = 0; i < message.length; i++)
+            {
+                if (message[i] != ' ')
+                    encrypted_filtered.push_back(message[i] - '0');
+            }
+
+            auto logger = make_logger();
+            str_t decrypted = Straddling::decrypt(encrypted_filtered, m_key, logger);
+            if (logger.has_errors)
+            {
+                // This should be shown to user in a red box.
+                // TODO: better errors (pass logger to decrypt())
+                printf("The encrypted sequence is not valid.\n");
+            }
+            else
+            {
+                m_refPlainTextBuffer->set_text(decrypted.chars);
+                str_free(decrypted);
+            }
         }
     }
     m_ignoreAnyInput = false;
