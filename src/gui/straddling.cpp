@@ -324,7 +324,7 @@ bool StraddlingBox::validate()
     if (keyword_size_increase_to_fit != 0)
     {
         s32 inv = std::abs(10 - (s32)keyword_size_increase_to_fit);
-        if (inv < keyword_size_increase_to_fit)
+        if (inv < keyword_size_increase_to_fit && m_keyword.length > inv)
         {
             printf("The keyword is too long. Consider removing %i characters.\n", inv);
         }
