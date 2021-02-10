@@ -194,7 +194,6 @@ void StraddlingBox::changed_show()
     if (!m_ignoreAnyInput)
     {
         m_ignoreAnyInput = true;
-        make_key();
         do_crypto(m_refPlainTextBuffer.get());
     }
 }
@@ -207,7 +206,6 @@ void StraddlingBox::changed_group_size()
         if (!m_ignoreAnyInput)
         {
             m_ignoreAnyInput = true;
-            make_key();
             do_crypto(m_refPlainTextBuffer.get());
         }
     }
@@ -469,13 +467,15 @@ void StraddlingBox::recreate_grid()
         attach_label((char)m_row_indices[i] + '0', 0, i + 2, m_TableGrid);
     }
 
+    size_t char_index = 0;
     for (size_t i = 0; i < m_row_indices.size(); i++)
     {
         size_t row = m_row_indices[i];
 
         for (size_t col = 0; col < 10; col++)
         {
-            attach_label(m_key.decrypt_normal[{row, col}], col + 1, i + 2, m_TableGrid);
+            attach_label(m_char_set[char_index], col + 1, i + 2, m_TableGrid);
+            char_index++;
         }
     }
 }

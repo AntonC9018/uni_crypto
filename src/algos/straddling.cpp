@@ -133,7 +133,7 @@ namespace Straddling
             {
                 if (i + 1 >= encrypted_message.size())
                 {
-                    logger_add_error(logger, "The enrypted message is not the right length.\n");
+                    logger_add_error(logger, "The encrypted message is not the right length.\n");
                     strb_free(decrypted);
                     return STR_NULL;
                 }
