@@ -11,6 +11,7 @@
 #include "../algos/straddling.h"
 #include "../algos/common.h"
 #include "../shared.h"
+#include "common.h"
 
 class StraddlingBox : public Gtk::Box
 {
@@ -56,7 +57,7 @@ private:
 
     void make_key();
     void do_crypto(Gtk::TextBuffer* text_buffer);
-    void recreate_grid();       // influenced by anything
+    void recreate_grid();       // influenced by key
 
     void leave_unique_in_alphabet(Gtk::Entry& entry, str_t& current);
     

@@ -8,6 +8,7 @@
 #include <strlib.h>
 #include "../algos/shift.h"
 #include "../algos/common.h"
+#include "common.h"
 
 class ShiftBox : public Gtk::Box
 {
@@ -25,11 +26,11 @@ private:
     bool validate_key();
     void add_error();
     void do_crypto(Gtk::TextBuffer* buffer);
-    void resize_grids();
+    void recreate_grids();
 
     // Handlers
-    void text_changed(Gtk::TextBuffer* buffer);
-    void perm_entry_changed(Gtk::Entry* entry, Gtk::Adjustment* adj);
+    void changed_text(Gtk::TextBuffer* buffer);
+    void changed_perm_entry(Gtk::Entry* entry, Gtk::Adjustment* adj);
 
     // Layout Stuff
     // Key

@@ -374,8 +374,7 @@ void StraddlingBox::do_crypto(Gtk::TextBuffer* text_buffer)
     if (m_valid) 
     {
         auto gtk_message = text_buffer->get_text();
-        size_t message_size = (size_t)gtk_message.size();
-        str_view_t message = { gtk_message.c_str(), message_size };
+        str_view_t message = { gtk_message.c_str(), gtk_message.size() };
 
         if (text_buffer == m_refPlainTextBuffer.get())
         {
@@ -410,6 +409,7 @@ void StraddlingBox::do_crypto(Gtk::TextBuffer* text_buffer)
         {
             std::vector<char> encrypted_filtered;
             encrypted_filtered.reserve(message.length);
+            
             // Filter out the ' '
             for (size_t i = 0; i < message.length; i++)
             {
@@ -435,23 +435,9 @@ void StraddlingBox::do_crypto(Gtk::TextBuffer* text_buffer)
     m_ignoreAnyInput = false;
 }
 
-static void remove_widget(Gtk::Widget& widget) 
-{ 
-    widget.get_parent()->remove(widget); 
-}
-
-static void attach_label(char text, int col, int row, Gtk::Grid& parent)
-{
-    auto t = Gtk::make_managed<Gtk::Label>();
-    parent.attach(*t, col + 1, row + 1, 1, 1);
-    char b[2] = { text, 0 };
-    t->set_text(b);
-    t->show();
-}
-
 void StraddlingBox::recreate_grid()
 {
-    m_TableGrid.forall(sigc::ptr_fun(remove_widget));
+    grid_remove_children(m_TableGrid);
     
     for (size_t i = 0; i < m_order.size(); i++)
     {

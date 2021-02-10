@@ -58,7 +58,7 @@ ShiftBox::ShiftBox()
     m_HeightButton.set_adjustment(m_HeightAdjustment);
     m_HeightButton.set_digits(0);
 
-    auto perm_entry_functor = sigc::mem_fun(*this, ShiftBox::perm_entry_changed);
+    auto perm_entry_functor = sigc::mem_fun(*this, ShiftBox::changed_perm_entry);
 
     m_RowPermLable.set_text("Row Permutation");
     m_RowPermEntry.set_text("624153");
@@ -76,7 +76,7 @@ ShiftBox::ShiftBox()
     m_UsageHeader.set_margin_bottom(10);
     m_UsageHeader.set_size_request(400);
 
-    auto text_changed_functor = sigc::mem_fun(*this, ShiftBox::text_changed); 
+    auto text_changed_functor = sigc::mem_fun(*this, ShiftBox::changed_text); 
 
     m_PlainTextLabel.set_text("Plain Message");
     m_refPlainTextBuffer = Gtk::TextBuffer::create();
@@ -106,9 +106,9 @@ ShiftBox::ShiftBox()
     show_all_children();
 
     m_ignoreTextInput = true;
-    perm_entry_changed(&m_ColPermEntry, m_WidthAdjustment.get());
+    changed_perm_entry(&m_ColPermEntry, m_WidthAdjustment.get());
     m_ignoreTextInput = false;
-    perm_entry_changed(&m_RowPermEntry, m_HeightAdjustment.get());
+    changed_perm_entry(&m_RowPermEntry, m_HeightAdjustment.get());
 }
 
 
@@ -117,10 +117,9 @@ bool is_nonzero_digit(char ch)
     return ch >= '1' && ch <= '9';
 }
 
-void ShiftBox::perm_entry_changed(Gtk::Entry* entry, Gtk::Adjustment* adj)
+void ShiftBox::changed_perm_entry(Gtk::Entry* entry, Gtk::Adjustment* adj)
 {
-    auto t = entry->get_text();
-    auto actual_text = t.c_str();
+    auto perm_text = entry->get_text();
     auto max_len = (size_t)(adj->get_value());
     auto sb = strb_make(max_len);
     bool mem[9] = {0};  // used digits, from 1 through nine
@@ -128,15 +127,15 @@ void ShiftBox::perm_entry_changed(Gtk::Entry* entry, Gtk::Adjustment* adj)
     auto& key_perm = (entry == &m_ColPermEntry) ? m_key.col_perm : m_key.row_perm;
     key_perm.clear();
 
-    for (size_t i = 0; i < t.size(); i++)
+    for (size_t i = 0; i < perm_text.size(); i++)
     {
         // 1 gets converted into 0
-        char number = actual_text[i] - '1';
+        char number = perm_text[i] - '1';
         if (number >= 0 && number < max_len)
         {
             if (!mem[number])
             {
-                strb_chr(sb, actual_text[i]);
+                strb_chr(sb, perm_text[i]);
                 key_perm.push_back(number);
             }
             mem[number] = true;
@@ -150,12 +149,12 @@ void ShiftBox::perm_entry_changed(Gtk::Entry* entry, Gtk::Adjustment* adj)
     str_free(str);
 
     // Validate the key (the length should be equal to width/heigth)
-    text_changed(m_refPlainTextBuffer.get());
+    changed_text(m_refPlainTextBuffer.get());
 
     // TODO: display errors.
 }
 
-void ShiftBox::text_changed(Gtk::TextBuffer* buffer)
+void ShiftBox::changed_text(Gtk::TextBuffer* buffer)
 {
     if (!m_ignoreTextInput)
     {
@@ -170,85 +169,74 @@ void ShiftBox::text_changed(Gtk::TextBuffer* buffer)
     }
 }
 
-static void remove_widget(Gtk::Widget& widget) 
-{ 
-    widget.get_parent()->remove(widget); 
-}
-
-static void attach_label(char text, int col, int row, Gtk::Grid& parent)
-{
-    auto t = Gtk::make_managed<Gtk::Label>();
-    parent.attach(*t, col + 1, row + 1, 1, 1);
-    char b[2] = { text, 0 };
-    t->set_text(b);
-    t->show();
-}
-
-static void attach_row_col_labels_normal(Gtk::Grid& parent, size_t width, size_t height)
-{
-    for (char col = 0; col < width; col++)
-    {
-        attach_label(col + '1', col + 1, 0, parent); 
-    }
-    for (char row = 0; row < height; row++)
-    {
-        attach_label(row + '1', 0, row + 1, parent);
-    }
-}
-
-static void attach_row_col_labels_perm(const Shift::Key& key, Gtk::Grid& parent, size_t width, size_t height)
-{
-    for (char col = 0; col < width; col++)
-    {
-        attach_label(key.col_perm[col] + '1', col + 1, 0, parent); 
-    }
-    for (char row = 0; row < height; row++)
-    {
-        attach_label(key.row_perm[row] + '1', 0, row + 1, parent);
-    }
-}
-
-static void resize_grid_normal(Gtk::Grid& parent, const Glib::ustring& str, size_t width, size_t height)
-{
-    parent.forall(sigc::ptr_fun(remove_widget));
-
-    size_t index = 0;
-    for (size_t row = 0; row < height; row++)
-    {
-        for (size_t col = 0; col < width; col++, index++)
-        {
-            attach_label(
-                index < str.size() ? str[index] : ' ', 
-                col + 1, row + 1, parent); 
-        }
-    }
-}
-
-static void resize_grid_perm(Gtk::Grid& parent, const Glib::ustring& str, size_t width, size_t height)
-{
-    parent.forall(sigc::ptr_fun(remove_widget));
-
-    size_t index = 0;
-    for (size_t col = 0; col < width; col++)
-    {
-        for (size_t row = 0; row < height; row++, index++)
-        {
-            attach_label(
-                index < str.size() ? str[index] : ' ', 
-                col + 1, row + 1, parent); 
-        }
-    }
-}
-
-void ShiftBox::resize_grids()
+void ShiftBox::recreate_grids()
 {
     size_t width =  m_key.col_perm.size();
     size_t height = m_key.row_perm.size();
 
-    resize_grid_normal(m_PlainGrid, m_refPlainTextBuffer->get_text(), width, height);
-    attach_row_col_labels_perm(m_key, m_PlainGrid, width, height);
-    resize_grid_perm(m_EncryptedGrid, m_refEncryptedTextBuffer->get_text(), width, height);
-    attach_row_col_labels_normal(m_EncryptedGrid, width, height);
+    // Fill in the PLAIN GRID with the message text and row-column labels
+    {
+        grid_remove_children(m_PlainGrid);
+
+        // The indices for the plain message are permuted according to the key
+        for (char col = 0; col < width; col++)
+        {
+            attach_label(m_key.col_perm[col] + '1', col + 1, 0, m_PlainGrid); 
+        }
+        for (char row = 0; row < height; row++)
+        {
+            attach_label(m_key.row_perm[row] + '1', 0, row + 1, m_PlainGrid);
+        }
+
+        // Message text
+        size_t index = 0;
+        auto message_text = m_refPlainTextBuffer->get_text();
+
+        // First go through each column, for each of the rows. 
+        // On the other hand, the encrypted text is the other way.
+        for (size_t row = 0; row < height; row++)
+        {
+            for (size_t col = 0; col < width; col++, index++)
+            {
+                attach_label(
+                    // When we leave the message text, insert spaces
+                    // Could also just break out of the loop, since the layout is a grid layout
+                    // and it doesn't matter if some of the spaces end up without objects
+                    index < message_text.size() ? message_text[index] : ' ', 
+                    col + 1, row + 1, m_PlainGrid); 
+            }
+        }
+    }
+
+    // Fill in the ENCRYPTED GRID with the ecrypted text and row-column labels
+    {
+        grid_remove_children(m_EncryptedGrid);
+
+        // The column and row labels are in order, not permuted
+        for (char col = 0; col < width; col++)
+        {
+            attach_label(col + '1', col + 1, 0, m_PlainGrid); 
+        }
+        for (char row = 0; row < height; row++)
+        {
+            attach_label(row + '1', 0, row + 1, m_PlainGrid);
+        }
+
+        // Encrypted text
+        size_t index = 0;
+        auto str = m_refEncryptedTextBuffer->get_text();
+
+        // First go through each row, for each of the columns
+        for (size_t col = 0; col < width; col++)
+        {
+            for (size_t row = 0; row < height; row++, index++)
+            {
+                attach_label(
+                    index < str.size() ? str[index] : ' ', 
+                    col + 1, row + 1, m_EncryptedGrid); 
+            }
+        }
+    }
 }
 
 void ShiftBox::do_crypto(Gtk::TextBuffer* text_buffer)
@@ -277,12 +265,7 @@ void ShiftBox::do_crypto(Gtk::TextBuffer* text_buffer)
         sprintf(buffer, "Chars left: %zu", Shift::max_message_size(m_key) - message_size);
         m_CharsLeftLabel.set_text(buffer);
     }
-    resize_grids();
-}
-
-void ShiftBox::add_error()
-{
-
+    recreate_grids();
 }
 
 bool ShiftBox::validate_key()
