@@ -181,11 +181,11 @@ void ShiftBox::recreate_grids()
         // The indices for the plain message are permuted according to the key
         for (char col = 0; col < width; col++)
         {
-            attach_label(m_key.col_perm[col] + '1', col + 1, 0, m_PlainGrid); 
+            attach_bold_label(m_key.col_perm[col] + '1', col + 1, 0, m_PlainGrid); 
         }
         for (char row = 0; row < height; row++)
         {
-            attach_label(m_key.row_perm[row] + '1', 0, row + 1, m_PlainGrid);
+            attach_bold_label(m_key.row_perm[row] + '1', 0, row + 1, m_PlainGrid);
         }
 
         // Message text
@@ -215,11 +215,11 @@ void ShiftBox::recreate_grids()
         // The column and row labels are in order, not permuted
         for (char col = 0; col < width; col++)
         {
-            attach_label(col + '1', col + 1, 0, m_PlainGrid); 
+            attach_bold_label(col + '1', col + 1, 0, m_EncryptedGrid); 
         }
         for (char row = 0; row < height; row++)
         {
-            attach_label(row + '1', 0, row + 1, m_PlainGrid);
+            attach_bold_label(row + '1', 0, row + 1, m_EncryptedGrid);
         }
 
         // Encrypted text

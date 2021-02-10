@@ -44,7 +44,8 @@ private:
     void changed_row_indices(); // -> row_indices
     // Note that the influence -> charset is satisfied transitively through keyword
     void changed_alphabet();    // :: keyword, scramble -> order; 
-    void changed_text(Gtk::TextBuffer* text_buffer);    // :: keyword, scramble -> order; 
+    void changed_message_text();
+    void changed_encrypted_text();
     void changed_show();
     void changed_group_size();
 
@@ -56,7 +57,8 @@ private:
     void refresh_row_indices();
 
     void make_key();
-    void do_crypto(Gtk::TextBuffer* text_buffer);
+    void do_encrypt();
+    void do_decrypt();
     void recreate_grid();       // influenced by key
 
     void leave_unique_in_alphabet(Gtk::Entry& entry, str_t& current);

@@ -3,6 +3,7 @@
 #include <gtkmm/notebook.h>
 #include "shift.h"
 #include "straddling.h"
+#include "vigenere.h"
 
 class MainWindow : public Gtk::Window
 {
@@ -15,4 +16,5 @@ private:
     Gtk::Label m_MainMessage;
     ShiftBox m_ShiftBox;
     StraddlingBox m_StraddlingBox;
+    VigenereBox m_VigenereBox;
 };
