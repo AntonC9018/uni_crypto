@@ -13,6 +13,7 @@
 
 // I assume it compiles for a billion years each time 
 // due to the megabytes heavy gtkmm headers.
+// UPDATE: It definitely does
 #include "gui/window.cpp"
 #include "gui/bazeries.cpp"
 #include "gui/common.cpp"
