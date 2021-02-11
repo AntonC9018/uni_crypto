@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <strlib.h>
 
-#define FIRST_CHARACTER 'a'
-#define LAST_CHARACTER 'z'
+#define FIRST_CHARACTER 'A'
+#define LAST_CHARACTER 'Z'
 #define LATIN_LENGTH (LAST_CHARACTER - FIRST_CHARACTER + 1)
 
 #define in_map(map, key) map.find((key)) != map.end()

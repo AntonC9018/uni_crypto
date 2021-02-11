@@ -39,7 +39,7 @@ StraddlingBox::StraddlingBox()
     m_UsageGrid.attach(m_EncryptedDisplay_GroupLengthButton, 2, 6, 1);
     m_UsageGrid.attach(m_EncryptedDisplay_ConcatenateButton, 1, 7, 1);
 
-    pack_start(m_TableGrid);
+    pack_start(m_TableGrid, Gtk::PACK_EXPAND_PADDING);
 
     m_TableGrid.set_halign(Gtk::ALIGN_CENTER);
 

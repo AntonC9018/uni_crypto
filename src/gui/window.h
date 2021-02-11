@@ -4,6 +4,7 @@
 #include "shift.h"
 #include "straddling.h"
 #include "vigenere.h"
+#include "bazeries.h"
 
 class MainWindow : public Gtk::Window
 {
@@ -17,4 +18,5 @@ private:
     ShiftBox m_ShiftBox;
     StraddlingBox m_StraddlingBox;
     VigenereBox m_VigenereBox;
+    BazeriesBox m_BazeriesBox;
 };

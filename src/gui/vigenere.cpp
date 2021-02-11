@@ -24,14 +24,13 @@ VigenereBox::VigenereBox()
     m_UsageGrid.attach(m_EncryptedTextLabel, 1, 4, 2);
     m_UsageGrid.attach(m_EncryptedTextView,  1, 5, 2);
 
-    pack_start(m_KeyTable_Grid);
+    pack_start(m_KeyTable_Grid, Gtk::PACK_EXPAND_PADDING);
     m_KeyTable_Grid.set_halign(Gtk::ALIGN_CENTER);
 
-    pack_start(m_EncryptionTable_Box);
+    pack_start(m_EncryptionTable_Box, Gtk::PACK_EXPAND_PADDING);
     m_EncryptionTable_Box.set_halign(Gtk::ALIGN_CENTER);
     m_EncryptionTable_Box.pack_start(m_EncryptionTableLabel_Grid, Gtk::PACK_SHRINK);
     m_EncryptionTable_Box.pack_start(m_EncryptionTable_Grid, Gtk::PACK_SHRINK);
-
 
     m_KeyHeader.set_markup("<u><b>Key</b></u>");
     m_KeyHeader.set_margin_top(10);
@@ -39,7 +38,7 @@ VigenereBox::VigenereBox()
 
     m_KeywordLabel.set_text("Keyword ");
     
-    m_KeywordEntry.set_text("battista");
+    m_KeywordEntry.set_text("BATTISTA");
     m_KeywordEntry.signal_changed().connect(
         sigc::mem_fun(*this, VigenereBox::changed_keyword)
     );
@@ -51,7 +50,7 @@ VigenereBox::VigenereBox()
 
     m_PlainTextLabel.set_text("Plain Message");
     m_refPlainTextBuffer = Gtk::TextBuffer::create();
-    m_refPlainTextBuffer->set_text("asimpleexample");
+    m_refPlainTextBuffer->set_text("ASIMPLEEXAMPLE");
     m_refPlainTextBuffer->signal_changed().connect(
         sigc::mem_fun(*this, VigenereBox::changed_message_text)
     );
@@ -93,32 +92,9 @@ void VigenereBox::changed_keyword()
     {
         m_ignoreAnyInput = true;
 
-        {
-            auto keyword_text = m_KeywordEntry.get_text();
-        
-            auto sb = strb_make(keyword_text.size());
-            for (size_t i = 0; i < keyword_text.size(); i++)
-            {
-                if (keyword_text[i] >= 'A' && keyword_text[i] <= 'Z')
-                {
-                    // Lower case all letters
-                    strb_chr(sb, keyword_text[i] - 'A' + 'a');
-                }
-                else if (keyword_text[i] >= 'a' && keyword_text[i] <= 'z')
-                {
-                    strb_chr(sb, keyword_text[i]);
-                }
-            }
-            str_t k = strb_build(sb);
-
-            m_KeywordEntry.set_text(k.chars);
-            if (m_keyword.chars) { str_free(m_keyword); }
-            m_keyword = k;
-        }
-
+        reset_keyword_from_entry_latin_upper(&m_KeywordEntry, &m_keyword);
         recreate_key_grid();
         do_encrypt();
-        recreate_encryption_grid();
     }
 }
 
@@ -129,7 +105,6 @@ void VigenereBox::changed_message_text()
         m_ignoreAnyInput = true;
         recreate_key_grid();
         do_encrypt();
-        recreate_encryption_grid();
     }
 }
 
@@ -140,28 +115,46 @@ void VigenereBox::changed_encrypted_text()
         m_ignoreAnyInput = true;
         recreate_key_grid();
         do_decrypt();
-        recreate_encryption_grid();
     }
+}
+
+bool VigenereBox::validate()
+{
+    bool valid = true;
+    if (m_keyword.length == 0)
+    {
+        printf("The keyword must contain at least one character.\n");
+        valid = false;
+    }
+    return valid;
 }
 
 void VigenereBox::do_encrypt()
 {
-    auto gtk_message = m_refPlainTextBuffer->get_text();
-    str_view_t message = { gtk_message.c_str(), gtk_message.size() };
-    auto encrypted = Vigenere::encrypt(message, { str_view(m_keyword) });
-    m_refEncryptedTextBuffer->set_text(encrypted.chars);
-    str_free(encrypted);
-    m_ignoreAnyInput = false;
+    if (validate())
+    {
+        auto gtk_message = m_refPlainTextBuffer->get_text();
+        str_view_t message = { gtk_message.c_str(), gtk_message.size() };
+        auto encrypted = Vigenere::encrypt(message, { str_view(m_keyword) });
+        m_refEncryptedTextBuffer->set_text(encrypted.chars);
+        str_free(encrypted);
+        recreate_encryption_grid();
+        m_ignoreAnyInput = false;        
+    }
 }
 
 void VigenereBox::do_decrypt()
 {
-    auto gtk_message = m_refEncryptedTextBuffer->get_text();
-    str_view_t message = { gtk_message.c_str(), gtk_message.size() };
-    auto decrypted = Vigenere::decrypt(message, { str_view(m_keyword) });
-    m_refPlainTextBuffer->set_text(decrypted.chars);
-    str_free(decrypted);
-    m_ignoreAnyInput = false;
+    if (validate())
+    {
+        auto gtk_message = m_refEncryptedTextBuffer->get_text();
+        str_view_t message = { gtk_message.c_str(), gtk_message.size() };
+        auto decrypted = Vigenere::decrypt(message, { str_view(m_keyword) });
+        m_refPlainTextBuffer->set_text(decrypted.chars);
+        str_free(decrypted);
+        recreate_encryption_grid();
+        m_ignoreAnyInput = false;
+    }
 }
 
 void VigenereBox::recreate_encryption_grid()

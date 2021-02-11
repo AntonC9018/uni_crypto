@@ -22,6 +22,8 @@ private:
     void changed_message_text();
     void changed_encrypted_text();
 
+    bool validate();
+
     void do_encrypt();
     void do_decrypt();
 
