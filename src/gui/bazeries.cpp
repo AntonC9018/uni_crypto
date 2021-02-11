@@ -78,14 +78,16 @@ BazeriesBox::BazeriesBox()
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
     m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD);
 
+    logger_attach(&logger, this);
+
     show_all_children();
+
     refresh_keyword();
     refresh_numeric_keyword();
     m_key = Bazeries::make_key(str_view(m_keyword), m_numeric_keyword);
     reread_plain_and_encrypt();
     recreate_grid();
 
-    m_valid = true;
     m_ignoreAnyInput = false;
 }
 
@@ -117,7 +119,7 @@ void BazeriesBox::changed_numeric_keyword()
 
 void BazeriesBox::changed_message_text()
 {
-    if (!m_ignoreAnyInput && m_valid)
+    if (!m_ignoreAnyInput && !logger.has_errors)
     {
         m_ignoreAnyInput = true;
 
@@ -129,7 +131,7 @@ void BazeriesBox::changed_message_text()
 
 void BazeriesBox::changed_encrypted_text()
 {
-    if (!m_ignoreAnyInput && m_valid)
+    if (!m_ignoreAnyInput && !logger.has_errors)
     {
         m_ignoreAnyInput = true;
 
@@ -214,17 +216,14 @@ Message BazeriesBox::refresh_text(Gtk::TextBuffer* textbuffer)
 
 void BazeriesBox::validate()
 {
-    m_valid = true;
-
+    logger_clear(&logger);
     if (m_keyword.length == 0)
     {
-        printf("The keyword must contain at least one character");
-        m_valid = false;
+        logger_add_error(&logger, str_lit("The keyword must contain at least one character"));
     }
     if (m_numeric_keyword.size() == 0)
     {
-        printf("The numeric keyword must contain at least one number");
-        m_valid = false;
+        logger_add_error(&logger, str_lit("The numeric keyword must contain at least one number"));
     }
 }
 
@@ -236,7 +235,7 @@ void BazeriesBox::make_key()
 
 void BazeriesBox::clear_message(Message message)
 {
-    if (message.plain.chars != 0)
+    if (!str_is_null(message.plain.chars))
     {
         str_free(message.plain);
         str_free(message.delimited);
@@ -245,6 +244,7 @@ void BazeriesBox::clear_message(Message message)
 
 void BazeriesBox::reread_plain_and_encrypt()
 {
+    clear_message(m_plain_message);
     m_plain_message = refresh_text(m_refPlainTextBuffer.get());
     do_encrypt();
 }
@@ -252,7 +252,7 @@ void BazeriesBox::reread_plain_and_encrypt()
 void BazeriesBox::remake_key_and_encrypt()
 {
     validate();
-    if (m_valid)
+    if (!logger.has_errors)
     {
         make_key();
         recreate_grid();

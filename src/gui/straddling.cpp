@@ -114,6 +114,8 @@ StraddlingBox::StraddlingBox()
     m_TableGrid.set_column_homogeneous(true);
     m_TableGrid.set_margin_end(20);
 
+    logger_attach(&logger, this);
+
     show_all_children();
 
     m_ignoreAnyInput = true;
@@ -125,6 +127,7 @@ StraddlingBox::StraddlingBox()
     refresh_order();
     make_key();
     do_encrypt();
+    m_ignoreAnyInput = false;
 }
 
 void StraddlingBox::changed_alphabet()
@@ -139,6 +142,7 @@ void StraddlingBox::changed_alphabet()
         refresh_charset();      // Satisfy the transitive and direct dependency alphabet -> (keyword) -> charset
         make_key();
         do_encrypt();
+        m_ignoreAnyInput = false;
     }
 }
 
@@ -151,6 +155,7 @@ void StraddlingBox::changed_keyword()
         refresh_charset();      // Satisfy the dependency keyword -> charset
         make_key();
         do_encrypt();
+        m_ignoreAnyInput = false;
     }
 }
 
@@ -163,6 +168,7 @@ void StraddlingBox::changed_scramble()
         refresh_order();
         make_key();
         do_encrypt();
+        m_ignoreAnyInput = false;
     }
 }
 
@@ -174,6 +180,7 @@ void StraddlingBox::changed_row_indices()
         refresh_row_indices();
         make_key();
         do_encrypt();
+        m_ignoreAnyInput = false;
     }
 }
 
@@ -183,6 +190,7 @@ void::StraddlingBox::changed_message_text()
     {
         m_ignoreAnyInput = true;
         do_encrypt();
+        m_ignoreAnyInput = false;
     }
 }
 
@@ -192,6 +200,7 @@ void::StraddlingBox::changed_encrypted_text()
     {
         m_ignoreAnyInput = true;
         do_decrypt();
+        m_ignoreAnyInput = false;
     }
 }
 
@@ -202,6 +211,7 @@ void StraddlingBox::changed_show()
     {
         m_ignoreAnyInput = true;
         do_encrypt();
+        m_ignoreAnyInput = false;
     }
 }
 
@@ -215,6 +225,7 @@ void StraddlingBox::changed_group_size()
             m_ignoreAnyInput = true;
             do_encrypt();
         }
+        m_ignoreAnyInput = false;
     }
 }
 
@@ -229,10 +240,9 @@ void StraddlingBox::refresh_alphabet()
     // The stinky conversion I have to do time after time here, since my functions
     // expect a null terminated string and the size. By the way, c_str() most likely
     // does an allocation and a copy too, eugh, it stinks.
-    if (m_alphabet.chars != 0)
-    {
+    if (!str_is_null(m_alphabet))
         str_free(m_alphabet);
-    }
+
     m_alphabet = str_copy(gtk_alphabet.data(), gtk_alphabet.size());
     // Since the alphabet is taken out of a selection, we know it is valid.
 }
@@ -249,7 +259,7 @@ void StraddlingBox::refresh_scramble()
 
 void StraddlingBox::refresh_charset()
 {
-    if (m_char_set.chars != 0)
+    if (!str_is_null(m_char_set))
         str_free(m_char_set);
 
     m_char_set = alphabet_without_keyword(str_view(m_keyword), str_view(m_alphabet));
@@ -304,13 +314,13 @@ void StraddlingBox::leave_unique_in_alphabet(Gtk::Entry& entry, str_t& current)
     str_t k = strb_build(sb);
 
     entry.set_text(k.chars);
-    if (current.chars) { str_free(current); }
+    if (!str_is_null(current)) { str_free(current); }
     current = k;
 }
 
-bool StraddlingBox::validate()
+void StraddlingBox::validate()
 {
-    bool valid = true;
+    logger_clear(&logger);
     // Validate the length of row_indices.
     // 10 is the harcoded value for column count
     auto can_sustain = m_row_indices.size() * 10;
@@ -320,50 +330,40 @@ bool StraddlingBox::validate()
 
     if (m_order.size() != 10)
     {
-        printf("The size of the scramble must be 10 (currently %zu).\n", m_order.size());
-        valid = false;
+        logger_format_error(&logger, "The size of the scramble must be 10 (currently %zu).\n", m_order.size());
     }
-    // if (m_keyword.length != m_order.size() - m_row_indices.size())
-    // {
-    //     printf("The size of the keyword must be %zu.\n", m_order.size() - m_row_indices.size());
-    //     valid = false;
-    // }
     if (keyword_size_increase_to_fit != 0)
     {
         s32 inv = std::abs(10 - (s32)keyword_size_increase_to_fit);
         if (inv < keyword_size_increase_to_fit && m_keyword.length > inv)
         {
-            printf("The keyword is too long. Consider removing %i characters.\n", inv);
+            logger_format_error(&logger, "The keyword is too long. Consider removing %i characters.\n", inv);
         }
         else
         {
-            printf("The alphabet cannot fully take up the space in the bottom of the table. "
+            logger_format_error(&logger, "The alphabet cannot fully take up the space in the bottom of the table. "
                 "Consider adding %zu unique characters into your keyword.\n", 
                 keyword_size_increase_to_fit);
         }
-        valid = false;
     }
     else if (can_sustain < m_char_set.length)
     {
-        printf("The alphabet does not fit in %zu rows. Consider adding more row indices.\n", 
+        logger_format_error(&logger, 
+            "The alphabet does not fit in %zu rows. Consider adding more row indices.\n", 
             m_row_indices.size());
-        valid = false;
     }
     else if (can_sustain > m_char_set.length)
     {
-        printf("Too many rows for the alphabet (%zu). Consider removing one or more row indices.\n", 
+        logger_format_error(&logger, 
+            "Too many rows for the alphabet (%zu). Consider removing one or more row indices.\n", 
             m_row_indices.size());
-        valid = false;
     }
-
-    return valid;
 }
 
 void StraddlingBox::make_key()
 {
-    m_valid = validate();
-
-    if (m_valid)
+    validate();
+    if (!logger.has_errors)
     {
         Straddling::destroy_key(m_key);
         m_key = Straddling::make_key(str_view(m_keyword), m_order, m_row_indices, str_view(m_char_set), 10);
@@ -378,13 +378,12 @@ void StraddlingBox::make_key()
 
 void StraddlingBox::do_encrypt()
 {
-    if (m_valid) 
+    if (!logger.has_errors) 
     {
         auto gtk_message = m_refPlainTextBuffer->get_text();
-        str_view_t message = { gtk_message.c_str(), gtk_message.size() };
+        str_view_t message = { gtk_message.data(), gtk_message.size() };
 
-        auto logger = make_logger();
-        auto encrypted = Straddling::encrypt(message, m_key, logger);
+        auto encrypted = Straddling::encrypt(message, m_key, &logger);
         if (!logger.has_errors)
         {
             if (m_show_in_groups)
@@ -398,8 +397,9 @@ void StraddlingBox::do_encrypt()
                         strb_chr(sb, ' ');
                     }
                 }
-                m_refEncryptedTextBuffer->set_text({ strb_build(sb).chars });
-                strb_free(sb);
+                auto str = strb_build(sb);
+                m_refEncryptedTextBuffer->set_text({ str.chars, str.length });
+                str_free(str);
             }
             else
             {
@@ -409,14 +409,16 @@ void StraddlingBox::do_encrypt()
                 m_refEncryptedTextBuffer->set_text({ encrypted.begin(), encrypted.end() });
             }
         }
-
-        m_ignoreAnyInput = false;
+        // TODO: This requires special logic 
+        // (either a second logger, or moving the logger thing out of the algorithm)
+        // Removing logging from the equation in the algo is certainly a good idea.
+        logger.has_errors = false;
     }
 }
 
 void StraddlingBox::do_decrypt()
 {
-    if (m_valid) 
+    if (!logger.has_errors) 
     {
         auto gtk_message = m_refEncryptedTextBuffer->get_text();
         str_view_t message = { gtk_message.c_str(), gtk_message.size() };
@@ -431,20 +433,13 @@ void StraddlingBox::do_decrypt()
                 encrypted_filtered.push_back(message[i] - '0');
         }
 
-        auto logger = make_logger();
-        str_t decrypted = Straddling::decrypt(encrypted_filtered, m_key, logger);
-        if (logger.has_errors)
-        {
-            // This should be shown to user in a red box.
-            // TODO: better errors (pass logger to decrypt())
-            printf("The encrypted sequence is not valid.\n");
-        }
-        else
+        str_t decrypted = Straddling::decrypt(encrypted_filtered, m_key, &logger);
+        if (!logger.has_errors)
         {
             m_refPlainTextBuffer->set_text(decrypted.chars);
             str_free(decrypted);
         }
-        m_ignoreAnyInput = false;
+        logger.has_errors = false;
     }
 }
 

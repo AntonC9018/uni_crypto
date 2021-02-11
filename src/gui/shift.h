@@ -9,6 +9,7 @@
 #include "../algos/shift.h"
 #include "../algos/common.h"
 #include "common.h"
+#include "../logger.h"
 
 class ShiftBox : public Gtk::Box
 {
@@ -23,7 +24,7 @@ private:
     bool m_ignoreTextInput;
     bool m_ignoreDimensionChange;
 
-    bool validate_key();
+    void validate();
     void add_error();
     void do_crypto(Gtk::TextBuffer* buffer);
     void recreate_grids();
@@ -72,4 +73,7 @@ private:
 
     Gtk::Grid m_PlainGrid;
     Gtk::Grid m_EncryptedGrid;
+
+    // Errors
+    Logger logger;
 };

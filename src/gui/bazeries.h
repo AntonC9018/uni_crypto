@@ -12,6 +12,7 @@
 #include "../algos/common.h"
 #include "../shared.h"
 #include "common.h"
+#include "../logger.h"
 
 struct Message
 {
@@ -30,7 +31,6 @@ private:
     str_t             m_keyword = {0};
     std::vector<char> m_numeric_keyword;
     Bazeries::Key m_key;
-    bool m_valid = false;
     bool m_ignoreAnyInput = true;
 
     Message m_plain_message = {0};
@@ -81,4 +81,7 @@ private:
     Gtk::Box  m_TableBox;
     Gtk::Grid m_TransposedAlphabet_Grid;
     Gtk::Grid m_PolybiosTable_Grid;
+
+    // Errors
+    Logger logger;
 };

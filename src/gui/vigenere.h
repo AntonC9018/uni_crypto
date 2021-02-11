@@ -8,6 +8,7 @@
 #include <strlib.h>
 #include "../algos/vigenere.h"
 #include "common.h"
+#include "../logger.h"
 
 class VigenereBox : public Gtk::Box
 {
@@ -22,7 +23,7 @@ private:
     void changed_message_text();
     void changed_encrypted_text();
 
-    bool validate();
+    void validate();
 
     void do_encrypt();
     void do_decrypt();
@@ -55,4 +56,7 @@ private:
     Gtk::Box  m_EncryptionTable_Box;
     Gtk::Grid m_EncryptionTableLabel_Grid;
     Gtk::Grid m_EncryptionTable_Grid;      // Displays the letter by letter process of encryption.
+    
+    // Errors
+    Logger logger;
 };

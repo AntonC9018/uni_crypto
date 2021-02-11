@@ -93,7 +93,7 @@ namespace Straddling
         }
     }
 
-    std::vector<char> encrypt(str_view_t message, const Key& key, Logger& logger)
+    std::vector<char> encrypt(str_view_t message, const Key& key, Logger* logger)
     {
         std::vector<char> encrypted_message;
         for (int i = 0; i < message.length; i++)
@@ -110,14 +110,14 @@ namespace Straddling
             }
             else
             {
-                logger_add_error(logger, "The character %c is not present in the dictionary.\n", message[i]);
+                logger_format_error(logger, "The character %c is not present in the dictionary.\n", message[i]);
                 return std::move(encrypted_message);
             }
         }
         return std::move(encrypted_message);
     }
 
-    str_t decrypt(const std::vector<char>& encrypted_message, const Key& key, Logger& logger)
+    str_t decrypt(const std::vector<char>& encrypted_message, const Key& key, Logger* logger)
     {
         str_builder_t decrypted = strb_make(encrypted_message.size());
         size_t i = 0;
@@ -133,7 +133,7 @@ namespace Straddling
             {
                 if (i + 1 >= encrypted_message.size())
                 {
-                    logger_add_error(logger, "The encrypted message is not the right length.\n");
+                    logger_add_error(logger, str_lit("The encrypted message is not the right length.\n"));
                     strb_free(decrypted);
                     return STR_NULL;
                 }
@@ -145,8 +145,10 @@ namespace Straddling
                 }
                 else
                 {
-                    logger_add_error(logger, "The encrypted combination (%i, %i) is not present in the dictionary.\n",
-                        (int)encrypted_key.first, (int)encrypted_key.second);
+                    logger_format_error(logger, 
+                        "The encrypted combination (%i, %i) is not present in the dictionary.\n", 
+                        (int)encrypted_key.first, (int)encrypted_key.second
+                    );
                     strb_free(decrypted);
                     return STR_NULL;
                 }

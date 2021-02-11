@@ -102,6 +102,8 @@ ShiftBox::ShiftBox()
     m_EncryptedGrid.set_column_homogeneous(true);
     m_EncryptedGrid.set_column_homogeneous(true);
     m_EncryptedGrid.set_margin_end(20);
+    
+    logger_attach(&logger, this);
 
     show_all_children();
 
@@ -160,7 +162,8 @@ void ShiftBox::changed_text(Gtk::TextBuffer* buffer)
     {
         m_ignoreTextInput = true;
 
-        if (validate_key())
+        validate();
+        if (!logger.has_errors)
         {
             do_crypto(buffer);
         }
@@ -268,22 +271,20 @@ void ShiftBox::do_crypto(Gtk::TextBuffer* text_buffer)
     recreate_grids();
 }
 
-bool ShiftBox::validate_key()
+void ShiftBox::validate()
 {
-    bool valid = true;
+    logger_clear(&logger);
 
     if (m_key.col_perm.size() < (size_t)m_WidthAdjustment->get_value())
     {
-        printf("Error: Not enough numbers in the col permutation vector. Expected %zu, got %zu.\n", 
+        logger_format_error(&logger,
+            "Error: Not enough numbers in the col permutation vector. Expected %zu, got %zu.\n", 
             (size_t)m_WidthAdjustment->get_value(), m_key.col_perm.size());
-        valid = false;
     }
     if (m_key.row_perm.size() < (size_t)m_HeightAdjustment->get_value())
     {
-        printf("Error: Not enough numbers in the row permutation vector. Expected %zu, got %zu.\n", 
+        logger_format_error(&logger,
+            "Error: Not enough numbers in the row permutation vector. Expected %zu, got %zu.\n", 
             (size_t)m_HeightAdjustment->get_value(), m_key.row_perm.size());
-        valid = false;
     }
-
-    return valid;
 }

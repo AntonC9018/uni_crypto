@@ -81,6 +81,8 @@ VigenereBox::VigenereBox()
     m_EncryptionTable_Grid.set_column_homogeneous(true);
     m_EncryptionTable_Grid.set_margin_end(20);
 
+    logger_attach(&logger, this);
+    
     show_all_children();
 
     changed_keyword();
@@ -93,8 +95,13 @@ void VigenereBox::changed_keyword()
         m_ignoreAnyInput = true;
 
         reset_keyword_from_entry_latin_upper(&m_KeywordEntry, &m_keyword);
-        recreate_key_grid();
-        do_encrypt();
+        validate();
+        if (!logger.has_errors)
+        {
+            recreate_key_grid();
+            do_encrypt();
+        }
+        m_ignoreAnyInput = false;        
     }
 }
 
@@ -103,8 +110,12 @@ void VigenereBox::changed_message_text()
     if (!m_ignoreAnyInput)
     {
         m_ignoreAnyInput = true;
-        recreate_key_grid();
-        do_encrypt();
+        if (!logger.has_errors)
+        {
+            recreate_key_grid();
+            do_encrypt();
+        }
+        m_ignoreAnyInput = false;        
     }
 }
 
@@ -113,48 +124,42 @@ void VigenereBox::changed_encrypted_text()
     if (!m_ignoreAnyInput)
     {
         m_ignoreAnyInput = true;
-        recreate_key_grid();
-        do_decrypt();
-    }
-}
-
-bool VigenereBox::validate()
-{
-    bool valid = true;
-    if (m_keyword.length == 0)
-    {
-        printf("The keyword must contain at least one character.\n");
-        valid = false;
-    }
-    return valid;
-}
-
-void VigenereBox::do_encrypt()
-{
-    if (validate())
-    {
-        auto gtk_message = m_refPlainTextBuffer->get_text();
-        str_view_t message = { gtk_message.c_str(), gtk_message.size() };
-        auto encrypted = Vigenere::encrypt(message, { str_view(m_keyword) });
-        m_refEncryptedTextBuffer->set_text(encrypted.chars);
-        str_free(encrypted);
-        recreate_encryption_grid();
+        if (!logger.has_errors)
+        {
+            recreate_key_grid();
+            do_decrypt();
+        }
         m_ignoreAnyInput = false;        
     }
 }
 
+void VigenereBox::validate()
+{
+    logger_clear(&logger);
+    if (m_keyword.length == 0)
+    {
+        logger_add_error(&logger, str_lit("The keyword must contain at least one character.\n"));
+    }
+}
+
+void VigenereBox::do_encrypt()
+{
+    auto gtk_message = m_refPlainTextBuffer->get_text();
+    str_view_t message = { gtk_message.c_str(), gtk_message.size() };
+    auto encrypted = Vigenere::encrypt(message, { str_view(m_keyword) });
+    m_refEncryptedTextBuffer->set_text({ encrypted.chars, encrypted.length });
+    str_free(encrypted);
+    recreate_encryption_grid();
+}
+
 void VigenereBox::do_decrypt()
 {
-    if (validate())
-    {
-        auto gtk_message = m_refEncryptedTextBuffer->get_text();
-        str_view_t message = { gtk_message.c_str(), gtk_message.size() };
-        auto decrypted = Vigenere::decrypt(message, { str_view(m_keyword) });
-        m_refPlainTextBuffer->set_text(decrypted.chars);
-        str_free(decrypted);
-        recreate_encryption_grid();
-        m_ignoreAnyInput = false;
-    }
+    auto gtk_message = m_refEncryptedTextBuffer->get_text();
+    str_view_t message = { gtk_message.c_str(), gtk_message.size() };
+    auto decrypted = Vigenere::decrypt(message, { str_view(m_keyword) });
+    m_refPlainTextBuffer->set_text({ decrypted.chars, decrypted.length });
+    str_free(decrypted);
+    recreate_encryption_grid();
 }
 
 void VigenereBox::recreate_encryption_grid()

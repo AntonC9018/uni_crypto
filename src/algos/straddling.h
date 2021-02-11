@@ -63,7 +63,7 @@ namespace Straddling
 
     void print_key(Key key);
 
-    std::vector<char> encrypt(str_view_t message, const Key& key, Logger& logger);
+    std::vector<char> encrypt(str_view_t message, const Key& key, Logger* logger);
 
-    str_t decrypt(const std::vector<char>& encrypted_message, const Key& key, Logger& logger);
+    str_t decrypt(const std::vector<char>& encrypted_message, const Key& key, Logger* logger);
 }

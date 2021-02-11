@@ -29,7 +29,6 @@ private:
     str_t m_char_set = {};
     std::vector<size_t> m_order = {};
     // Whether can generate
-    bool m_valid = false;
     bool m_ignoreAnyInput = false;
     // Display setting: group size
     bool m_show_in_groups = true;
@@ -37,7 +36,7 @@ private:
 
     Straddling::Key m_key = {};
 
-    bool validate();    
+    void validate();    
 
     void changed_keyword();     // -> keyword, charset
     void changed_scramble();    // -> order
@@ -98,4 +97,7 @@ private:
 
     // Table
     Gtk::Grid m_TableGrid;
+
+    // Errors
+    Logger logger;
 };
