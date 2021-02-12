@@ -1,5 +1,6 @@
 # Laborator 1
 
+A realizat: **Curmanschii Anton, IA1901**.
 
 ## Sarcini
 
@@ -89,7 +90,7 @@ Primele două câmpuri (Width și Height) definesc dimensiunile tabelului de cri
 
 Pe urmă avem câmpurile pentru definirea permutării a rândurilor și a coloanelor în tabelul de criptare.
 
-### Descrierea și Pseudocod
+### Descriere și Pseudocod
 
 Putem cripta prin această metodă orice mesaj. Pentru lucrul acesta:
 
@@ -228,7 +229,7 @@ Câmpul Scramble definește ordinea coloanelor din tabela. De exemplu, scramble-
 
 Ultimul câmp, cuvântul cheie, definește ce litere vor fi criptate printr-un singur caracter (mai mult urmează).
 
-### Descrierea și Pseudocod
+### Descriere și Pseudocod
 
 Ca să înțelegem algoritmul dat, trebuie să ne dăm seama cum va arăta textul criptat. Cum putem vedea din screenshot-ul de mai jos, mesajul criptat este numeric. Trbuie să mai înțelegem un lucru: un caracter poate fi criptat în un caracter sau în două. Caracterele de pe rândul de sus (în afară liniuțelor) sunt criptate printr-o cifră, iar celelalte - prin două.
 
@@ -270,7 +271,7 @@ până când indice < m_criptat.lungime
 
     indice++
 
-return m_criptat
+return m_decriptat
 ```
 
 Implementarea însuși tabelului pentru asocierile date nu-l voi descrie în pseudocod.
@@ -406,5 +407,5 @@ namespace Straddling
 
 ![Vigenere](image/vigenere.png)
 ### Câmpurile customizabile
-### Descrierea și Pseudocod
+### Descriere și Pseudocod
 ### Implementarea în C++
