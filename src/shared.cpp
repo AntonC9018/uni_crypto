@@ -85,7 +85,6 @@ const char* validate(str_view_t m, str_view_t alphabet)
 str_t alphabet_without_keyword(str_view_t keyword, str_view_t alphabet)
 {
     str_builder_t result = strb_make(alphabet.length);
-    size_t i = 0;
 
     for (size_t j = 0; j < alphabet.length; j++)
     {
@@ -129,7 +128,8 @@ std::vector<size_t> arrange(str_view_t string, str_view_t alphabet)
     {
         result[i] = things[i].index;
     }
-    return std::move(result);
+    
+    return result;
 }
 
 std::vector<size_t> without(const std::vector<size_t>& order, const std::vector<size_t>& but)
@@ -143,7 +143,10 @@ std::vector<size_t> without(const std::vector<size_t>& order, const std::vector<
             result.push_back(i);
         }
     }
-    return std::move(result);
+    // Due to copy elision, this seems to be better than
+    // result std::move(result);
+    // Since no copy is actually going to be created.
+    return result;
 }
 
 str_t leave_unique(str_view_t but, str_view_t all)
@@ -174,4 +177,4 @@ size_t find_index(const std::vector<size_t>& v, size_t item)
         }
     }
     return -1;
-} 
+}

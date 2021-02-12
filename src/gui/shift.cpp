@@ -132,7 +132,7 @@ void ShiftBox::changed_perm_entry(Gtk::Entry* entry, Gtk::Adjustment* adj)
     for (size_t i = 0; i < perm_text.size(); i++)
     {
         // 1 gets converted into 0
-        char number = perm_text[i] - '1';
+        u8 number = perm_text[i] - '1';
         if (number >= 0 && number < max_len)
         {
             if (!mem[number])
@@ -182,11 +182,11 @@ void ShiftBox::recreate_grids()
         grid_remove_children(m_PlainGrid);
 
         // The indices for the plain message are permuted according to the key
-        for (char col = 0; col < width; col++)
+        for (size_t col = 0; col < width; col++)
         {
             attach_bold_label(m_key.col_perm[col] + '1', col + 1, 0, m_PlainGrid); 
         }
-        for (char row = 0; row < height; row++)
+        for (size_t row = 0; row < height; row++)
         {
             attach_bold_label(m_key.row_perm[row] + '1', 0, row + 1, m_PlainGrid);
         }
@@ -216,13 +216,13 @@ void ShiftBox::recreate_grids()
         grid_remove_children(m_EncryptedGrid);
 
         // The column and row labels are in order, not permuted
-        for (char col = 0; col < width; col++)
+        for (size_t col = 0; col < width; col++)
         {
-            attach_bold_label(col + '1', col + 1, 0, m_EncryptedGrid); 
+            attach_bold_label((char) col + '1', col + 1, 0, m_EncryptedGrid); 
         }
-        for (char row = 0; row < height; row++)
+        for (size_t row = 0; row < height; row++)
         {
-            attach_bold_label(row + '1', 0, row + 1, m_EncryptedGrid);
+            attach_bold_label((char) row + '1', 0, row + 1, m_EncryptedGrid);
         }
 
         // Encrypted text

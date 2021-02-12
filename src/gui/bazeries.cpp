@@ -171,7 +171,7 @@ void BazeriesBox::refresh_numeric_keyword()
 // Returns the new text
 Message BazeriesBox::refresh_text(Gtk::TextBuffer* textbuffer)
 {
-    auto gtk_message = textbuffer->get_text();
+    auto gtk_message  = textbuffer->get_text();
     auto delimited_sb = strb_make(gtk_message.size() * 2);
     auto plain_sb     = strb_make(gtk_message.size());
 
@@ -187,7 +187,7 @@ Message BazeriesBox::refresh_text(Gtk::TextBuffer* textbuffer)
         }
         if (ch >= 'A' && ch <= 'Z')
         {
-            if (current_count == m_key.numeric_keyword[numeric_keyword_index])
+            if (current_count == (size_t) m_key.numeric_keyword[numeric_keyword_index])
             {
                 strb_chr(delimited_sb, ' ');
                 numeric_keyword_index++;
@@ -235,7 +235,7 @@ void BazeriesBox::make_key()
 
 void BazeriesBox::clear_message(Message message)
 {
-    if (!str_is_null(message.plain.chars))
+    if (!str_is_null(message.plain))
     {
         str_free(message.plain);
         str_free(message.delimited);

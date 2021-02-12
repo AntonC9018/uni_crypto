@@ -16,7 +16,7 @@ namespace Shift
         // Make sure the length of the message is no more than that.
         if (message.length > encrypted.length)
         {
-            report_error("The message is too large. Max size for the given key is %uz, but the message had size %uz. Here it is: %s", 
+            report_error("The message is too large. Max size for the given key is %zu, but the message had size %zu. Here it is: %s", 
                 encrypted.length, message.length, message.chars);
         }
 

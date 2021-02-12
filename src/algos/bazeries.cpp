@@ -27,13 +27,6 @@ namespace Bazeries
         return alpha;
     }
 
-    static size_t transpose_index(size_t index, size_t dim)
-    {
-        size_t row = index / dim;
-        size_t col = index % dim;
-        return col * dim + row;
-    }
-
     str_t xxcrypt(str_view_t message, const Key& key, Crypto_Action action)
     {
         str_t result = str_make(message.length);
@@ -54,7 +47,7 @@ namespace Bazeries
                 if (action == ENCRYPT)
                 {
                     size_t ch_index = str_find_char_index(str_view(key.transposed_alphabet), message[j]);
-                    if (ch_index == -1)
+                    if (ch_index == (size_t)-1)
                     {
                         report_error("Character %c not found in string %s", message[j], key.transposed_alphabet.chars);
                     }
@@ -63,7 +56,7 @@ namespace Bazeries
                 else
                 {
                     size_t ch_index = str_find_char_index(str_view(key.poly.table), message[j]);
-                    if (ch_index == -1)
+                    if (ch_index == (size_t)-1)
                     {
                         report_error("Character %c not found in string %s", message[j], key.poly.table.chars);
                     }
@@ -80,6 +73,13 @@ namespace Bazeries
         return result;
     }
 
+    void destroy_key(Key& key)
+    {
+        Polybios::destroy_key(key.poly);
+        str_free(key.transposed_alphabet);
+        key.numeric_keyword.clear();
+        std::vector<char>().swap(key.numeric_keyword);
+    }
     
     str_t delimit(str_view_t plain_text, const Key& key)
     {
@@ -90,7 +90,7 @@ namespace Bazeries
 
         for (size_t i = 0; i < plain_text.length; i++)
         {
-            if (current_count == key.numeric_keyword[numeric_keyword_index])
+            if (current_count == (size_t)key.numeric_keyword[numeric_keyword_index])
             {
                 strb_chr(delimited_sb, ' ');
                 numeric_keyword_index++;

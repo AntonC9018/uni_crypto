@@ -1,9 +1,9 @@
 #include "straddling.h"
 
 StraddlingBox::StraddlingBox()
-    : m_EncryptedDisplay_GroupsButton("Show encrypted message in groups of")
+    : Gtk::Box(Gtk::ORIENTATION_VERTICAL)
+    , m_EncryptedDisplay_GroupsButton("Show encrypted message in groups of")
     , m_EncryptedDisplay_ConcatenateButton("Concatenate the message")
-    , Gtk::Box(Gtk::ORIENTATION_VERTICAL)
 {
     pack_start(m_KeyGrid);
 
@@ -334,7 +334,7 @@ void StraddlingBox::validate()
     }
     if (keyword_size_increase_to_fit != 0)
     {
-        s32 inv = std::abs(10 - (s32)keyword_size_increase_to_fit);
+        u32 inv = std::abs(10 - (s32)keyword_size_increase_to_fit);
         if (inv < keyword_size_increase_to_fit && m_keyword.length > inv)
         {
             logger_format_error(&logger, "The keyword is too long. Consider removing %i characters.\n", inv);
@@ -464,8 +464,6 @@ void StraddlingBox::recreate_grid()
     size_t char_index = 0;
     for (size_t i = 0; i < m_row_indices.size(); i++)
     {
-        size_t row = m_row_indices[i];
-
         for (size_t col = 0; col < 10; col++)
         {
             attach_label(m_char_set[char_index], col + 1, i + 2, m_TableGrid);

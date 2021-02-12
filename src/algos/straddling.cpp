@@ -17,13 +17,12 @@ namespace Straddling
         {
             if (code_positions[i] >= dim)
             {
-                report_error("Height limit of %i exceeded", dim);
+                report_error("Height limit of %zu exceeded", dim);
             }
             key.encrypt_header[keyword[i]] = { (char)code_positions[i] };
             key.decrypt_header[{ (char)code_positions[i] }] = keyword[i];
         }
 
-        size_t col = 0;
         size_t index = 0;
 
         for (size_t row : row_indices)
@@ -96,7 +95,7 @@ namespace Straddling
     std::vector<char> encrypt(str_view_t message, const Key& key, Logger* logger)
     {
         std::vector<char> encrypted_message;
-        for (int i = 0; i < message.length; i++)
+        for (size_t i = 0; i < message.length; i++)
         {
             if (in_map(key.encrypt_header, message[i]))
             {
@@ -111,10 +110,10 @@ namespace Straddling
             else
             {
                 logger_format_error(logger, "The character %c is not present in the dictionary.\n", message[i]);
-                return std::move(encrypted_message);
+                return encrypted_message;
             }
         }
-        return std::move(encrypted_message);
+        return encrypted_message;
     }
 
     str_t decrypt(const std::vector<char>& encrypted_message, const Key& key, Logger* logger)
@@ -124,7 +123,6 @@ namespace Straddling
 
         while (i < encrypted_message.size())
         {
-            size_t index;
             if (in_map(key.decrypt_header, encrypted_message[i]))
             {
                 strb_chr(decrypted, key.decrypt_header.at(encrypted_message[i]));
