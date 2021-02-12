@@ -145,7 +145,7 @@ void VigenereBox::validate()
 void VigenereBox::do_encrypt()
 {
     auto gtk_message = m_refPlainTextBuffer->get_text();
-    str_view_t message = { gtk_message.c_str(), gtk_message.size() };
+    str_view_t message = { gtk_message.data(), gtk_message.size() };
     auto encrypted = Vigenere::encrypt(message, { str_view(m_keyword) });
     m_refEncryptedTextBuffer->set_text({ encrypted.chars, encrypted.length });
     str_free(encrypted);
@@ -155,7 +155,7 @@ void VigenereBox::do_encrypt()
 void VigenereBox::do_decrypt()
 {
     auto gtk_message = m_refEncryptedTextBuffer->get_text();
-    str_view_t message = { gtk_message.c_str(), gtk_message.size() };
+    str_view_t message = { gtk_message.data(), gtk_message.size() };
     auto decrypted = Vigenere::decrypt(message, { str_view(m_keyword) });
     m_refPlainTextBuffer->set_text({ decrypted.chars, decrypted.length });
     str_free(decrypted);

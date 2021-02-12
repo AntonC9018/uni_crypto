@@ -3,7 +3,7 @@
 namespace Shift
 {
     // If a letter starts off at position x, y, it will end up at
-    // lin_perm[x], col_perm[y]. To go back, find the encrypted x and y
+    // row_perm[x], col_perm[y]. To go back, find the encrypted x and y
     // in these lists and take the index.
     // I'm going to represent the letters as a linear array.
     str_t encrypt(str_view_t message, const Key& key)

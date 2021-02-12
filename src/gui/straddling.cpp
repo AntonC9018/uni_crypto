@@ -421,7 +421,7 @@ void StraddlingBox::do_decrypt()
     if (!logger.has_errors) 
     {
         auto gtk_message = m_refEncryptedTextBuffer->get_text();
-        str_view_t message = { gtk_message.c_str(), gtk_message.size() };
+        str_view_t message = { gtk_message.data(), gtk_message.size() };
 
         std::vector<char> encrypted_filtered;
         encrypted_filtered.reserve(message.length);

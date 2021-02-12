@@ -1,13 +1,16 @@
 #include "common.h"
 
-void remove_widget(Gtk::Widget& widget) 
-{ 
-    widget.get_parent()->remove(widget); 
-}
-
 void grid_remove_children(Gtk::Grid& grid)
 {
-    grid.forall(sigc::ptr_fun(remove_widget));
+    auto childList = grid.get_children();
+    auto it = childList.begin();
+
+    while (it != childList.end()) 
+    {
+        grid.remove(**it);
+        delete *it;
+        it++;
+    }
 }
 
 static Pango::FontDescription consolas_font("Consolas normal 12");
