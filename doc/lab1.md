@@ -481,7 +481,7 @@ Prin cod putem face ultimele două pasuri într-o dată. Tabelele le putem repre
 m        := mesajul criptat
 alfabet  := alfabetul, unde J este eliminată (sau orice alt alfabet cu dimensiunile corecte).
             reprezintă de fapt primul tabel. Atenție: dacă acest tabel este format simplu prin 
-            scoaterea lui J din alfabet normal latin, trebuie să fie și inversat, fiindcă îl citim
+            scoaterea lui J din alfabet normal latin, trebuie să fie și transpus, fiindcă îl citim
             în modul coloană-rând.
 polybios := cheia polybios (tabelul 2)
 grupuri  := cheia numerica
