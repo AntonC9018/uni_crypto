@@ -2,6 +2,8 @@
 
 A realizat: **Curmanschii Anton, IA1901**.
 
+Întregul cod puteți găsi pe [github-ul meu](https://github.com/AntonC9018/uni_crypto).
+
 ## Sarcini
 
 1. De construit o interfață grafică pentru prezentarea unelor sisteme de criptare. Am avut varianta 2, de aceea am integrat in interfață algoritmele de criptare *cu deplasare pe rând și coloană*, *straddling checkerbox*, *vigenere* și *bazeries*.
@@ -278,7 +280,7 @@ Implementarea însuși tabelului pentru asocierile date nu-l voi descrie în pse
 
 ### Implementarea în C++
 
-Unele macro-uri și chestii sunt omise pentru simplicitate. str_builder_t funcționează în acest ca un vector de caracteri.
+Unele macro-uri și chestii sunt omise pentru simplicitate. str_builder_t funcționează în acest exemplu în mare parte ca un vector de caractere.
 
 ```cpp
 namespace Straddling
@@ -406,6 +408,164 @@ namespace Straddling
 ## Vigenere
 
 ![Vigenere](image/vigenere.png)
+
 ### Câmpurile customizabile
+
+Câmpul cu cheia determină cheia fluidă utilizată la criptare.
+
 ### Descriere și Pseudocod
+
+Acest algoritm este bazat pe algoritmul lui Caesar, însă îl îmbunătățește. Este utilizată o cheie fluidă care definește o deplasare Caesar diferită pentru fiecare literă a mesajului. În exemplul de pe imagine, pentru a cripta prima litera A, se ia a doua linie din tabel de mai sus care de fapt este echivalentă cu cifrul Caesar cu deplasare 1 (a prima linie din tabelul de mai sus este pentru referință), și se ia caracterul de pe poziția caracterului A din alfabetul latin normal (1). Prin urmare, obținem litera B. A doua literă S este luată din alfabetul Caesar cu deplasare 0, de pe a treia linie din tabel de mai sus, deci este criptată ca S. Când sunt utilizate toate literele cuvântului cheie, ne întoarcem iarași la rândul 2.
+
+Matematic, algoritmul este și mai simplu. Formula pentru criptare este, dacă îi atribuim câte un indice fiecărei litere din tabel, de la 0 pentru A până la 26 pentru Z, `mesaj_criptată[i] = (cuvântul_cheie[i % lungimea_cuvântului_cheie] + mesaj[i]) mod 26`, iar pentru decriptare scadem litera cuvantului cheie. Luăm valorile pozitive pentru mod (restul împărțirii).
+
+```
+m              := mesaj pentru criptare/decriptare, ca un șir de caractere din alfabetul latin
+cuvântul_cheie := șirul de caractere cuvântului cheie
+acțiunea       := 1 dacă are loc criptarea, -1 dacă decriptăm
+
+pentru fiecare indice mesajului
+    m_rezultant += (m[indice] + acțiunea * cuvântul_cheie[indice % cuvântul_cheie.lungime]) % 26
+
+return m_rezultant
+```
+
 ### Implementarea în C++
+
+Macrourile `FIRST_CHARACTER` și `LATIN_LENGTH` sunt echivalente cu 'A' și 26 respectiv, iar Crypto_Action este 1 sau -1, cum descris mai sus.
+
+```cpp
+namespace Vigenere
+{
+    // We assume only plain upper case latin letters are used
+    str_t xxcrypt(str_view_t message, const Key& key, Crypto_Action action)
+    {
+        str_t result = str_make(message.length);
+        size_t j = 0;
+
+        for (size_t i = 0; i < message.length; i++)
+        {
+            result[i] = ((message[i] - FIRST_CHARACTER) + action * (key.keyword[j] - FIRST_CHARACTER) + LATIN_LENGTH) % LATIN_LENGTH + FIRST_CHARACTER;
+
+            j++;
+            if (j == key.keyword.length) 
+            {
+                j = 0;
+            }
+        }
+
+        return result;
+    }
+}
+```
+
+## Bazeries
+
+![Bazeries](image/bazeries.png)
+
+### Câmpurile customizabile
+
+Cuvântul cheie definește ordinea în al doilea tabel (polybios).
+
+Cheia numerică definește lungimele grupurilor cuvintelor la inversare.
+
+### Descriere și Pseudocod
+
+Se utilizează alfabetul latin modificat ca el să aibă numai 25 caractere pentru ca să se încape în tabel: J este combinată cu I. Tabelul 1 este completat cu literele alfabetului latin, în ordinea coloană-rând, iar în al doilea tabel la început se înscrie cuvântul cheie, fără repetări ale literelor, iar pe urmă restul alfabetului, în ordinea rând-coloană. 
+
+La criptare literele mesajului sunt culese în grupuri de lungime, definită de cheia numerică. În exemplul de pe imagine, avem grupurile de 7, 3, 5 și 2 caractere, iar literele mesajului sunt mereu afișate deja grupate după aceste numere. Pe urmă literele sunt criptate în așa fel: se ia litera din al doilea tabel de pe poziția literei curente a mesajului în primul tabel. La următorul pas, se obține mesajul criptat prin inversarea tuturor grupurilor de caractere.
+
+Prin cod putem face ultimele două pasuri într-o dată. Tabelele le putem reprezenta ca un șir unidimensional de caractere.
+
+```
+m        := mesajul criptat
+alfabet  := alfabetul, unde J este eliminată (sau orice alt alfabet cu dimensiunile corecte).
+            reprezintă de fapt primul tabel. Atenție: dacă acest tabel este format simplu prin 
+            scoaterea lui J din alfabet normal latin, trebuie să fie și inversat, fiindcă îl citim
+            în modul coloană-rând.
+polybios := cheia polybios (tabelul 2)
+grupuri  := cheia numerica
+
+indice_grup  := 0
+indice_mesaj := 0
+
+până când indice_mesaj < m.lungime
+    lungimea_blocului := min(grupuri[indice_grup], m.lungime - indice_mesaj)
+    indice_în_grup    := lungimea_blocului - 1
+    indice_mesaj_temp := indice_mesaj
+
+    până când indice_în_grup >= 0
+        indice_mesaj_criptat := indice_mesaj_temp + indice_în_grup
+        poziția_în_alfabet   := find_index(alfabet, m[indice_mesaj_temp])
+        m_criptat            += polybios[poziția_în_alfabet]
+        indice_în_grup--
+        indice_mesaj_temp++
+    
+    indice_mesaj += lungimea_blocului
+    indice_grup++
+
+    dacă indice_grup >= grupuri.lungime
+        indice_grup := 0
+
+return m_criptat
+```
+
+Decriptarea este identica cu criptarea, numai că tabelele sunt interschimbat.
+
+### Implementarea în C++
+
+Iarăși nu arăt generarea cheilor.
+
+```cpp
+namespace Bazeries
+{
+    str_t xxcrypt(str_view_t message, const Key& key, Crypto_Action action)
+    {
+        str_t result = str_make(message.length);
+
+        size_t current_block_index = 0;
+        size_t message_index       = 0;
+        size_t group_offset        = 0;
+
+        while (group_offset < message.length)
+        {
+            size_t current_block_length = std::min(
+                (size_t)key.numeric_keyword[current_block_index], message.length - group_offset);
+            size_t in_block_index = current_block_length - 1;
+
+            while ((s32)in_block_index >= 0)
+            {
+                size_t result_index = group_offset + in_block_index;
+
+                if (action == ENCRYPT)
+                {
+                    size_t ch_index = str_find_char_index(str_view(key.transposed_alphabet), message[message_index]);
+                    if (ch_index == (size_t)-1)
+                    {
+                        report_error("Character %c not found in string %s", 
+                            message[message_index], key.transposed_alphabet.chars);
+                    }
+                    result[result_index] = key.poly.table[ch_index];
+                }
+                else
+                {
+                    size_t ch_index = str_find_char_index(str_view(key.poly.table), message[message_index]);
+                    if (ch_index == (size_t)-1)
+                    {
+                        report_error("Character %c not found in string %s", 
+                            message[message_index], key.poly.table.chars);
+                    }
+                    result[result_index] = key.transposed_alphabet[ch_index];
+                }
+
+                in_block_index--;
+                message_index++;
+            }
+            group_offset += current_block_length;
+            current_block_index = (current_block_index + 1) % key.numeric_keyword.size();
+        }
+
+        return result;
+    }
+}
+```

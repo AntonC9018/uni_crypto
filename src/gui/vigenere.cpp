@@ -182,15 +182,20 @@ void VigenereBox::recreate_key_grid()
 {
     grid_remove_children(m_KeyTable_Grid);
 
+    for (char j = 0; j < LATIN_LENGTH; j++)
+    {
+        attach_bold_label(j + 'A', j, 0, m_KeyTable_Grid);
+    }
+
     for (size_t i = 0; i < m_keyword.length; i++)
     {
-        attach_bold_label(m_keyword[i], 0, i, m_KeyTable_Grid);
+        attach_bold_label(m_keyword[i], 0, i + 1, m_KeyTable_Grid);
 
         for (char j = 1; j < LATIN_LENGTH; j++)
         {
             attach_label(
                 (m_keyword[i] + j - FIRST_CHARACTER) % LATIN_LENGTH + FIRST_CHARACTER,
-                j, i, m_KeyTable_Grid
+                j, i + 1, m_KeyTable_Grid
             ); 
         }
     }

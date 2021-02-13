@@ -32,41 +32,44 @@ namespace Bazeries
         str_t result = str_make(message.length);
 
         size_t current_block_index = 0;
-        size_t i = 0;
-        size_t j = 0;
+        size_t message_index       = 0;
+        size_t group_offset        = 0;
 
-        while (i < message.length)
+        while (group_offset < message.length)
         {
-            size_t current_block_length = std::min((size_t)key.numeric_keyword[current_block_index], message.length - i);
+            size_t current_block_length = std::min(
+                (size_t)key.numeric_keyword[current_block_index], message.length - group_offset);
             size_t in_block_index = current_block_length - 1;
 
             while ((s32)in_block_index >= 0)
             {
-                size_t index = i + in_block_index;
+                size_t result_index = group_offset + in_block_index;
 
                 if (action == ENCRYPT)
                 {
-                    size_t ch_index = str_find_char_index(str_view(key.transposed_alphabet), message[j]);
+                    size_t ch_index = str_find_char_index(str_view(key.transposed_alphabet), message[message_index]);
                     if (ch_index == (size_t)-1)
                     {
-                        report_error("Character %c not found in string %s", message[j], key.transposed_alphabet.chars);
+                        report_error("Character %c not found in string %s", 
+                            message[message_index], key.transposed_alphabet.chars);
                     }
-                    result[index] = key.poly.table[ch_index];
+                    result[result_index] = key.poly.table[ch_index];
                 }
                 else
                 {
-                    size_t ch_index = str_find_char_index(str_view(key.poly.table), message[j]);
+                    size_t ch_index = str_find_char_index(str_view(key.poly.table), message[message_index]);
                     if (ch_index == (size_t)-1)
                     {
-                        report_error("Character %c not found in string %s", message[j], key.poly.table.chars);
+                        report_error("Character %c not found in string %s", 
+                            message[message_index], key.poly.table.chars);
                     }
-                    result[index] = key.transposed_alphabet[ch_index];
+                    result[result_index] = key.transposed_alphabet[ch_index];
                 }
 
                 in_block_index--;
-                j++;
+                message_index++;
             }
-            i += current_block_length;
+            group_offset += current_block_length;
             current_block_index = (current_block_index + 1) % key.numeric_keyword.size();
         }
 

@@ -2,7 +2,7 @@
 
 namespace Vigenere
 {
-    // We assume only plain lower case latin letters are used
+    // We assume only plain upper case latin letters are used
     str_t xxcrypt(str_view_t message, const Key& key, Crypto_Action action)
     {
         str_t result = str_make(message.length);
