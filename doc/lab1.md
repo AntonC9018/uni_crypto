@@ -496,8 +496,8 @@ până când indice_mesaj < m.lungime
 
     până când indice_în_grup >= 0
         indice_mesaj_criptat := indice_mesaj_temp + indice_în_grup
-        poziția_în_alfabet   := find_index(alfabet, m[indice_mesaj_temp])
-        m_criptat            += polybios[poziția_în_alfabet]
+        poziția_în_alfabet   := find_index(alfabet, m[indice_mesaj])
+        m_criptat[indice_mesaj_criptat] = polybios[poziția_în_alfabet]
         indice_în_grup--
         indice_mesaj_temp++
     
