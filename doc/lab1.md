@@ -34,7 +34,7 @@ Am decis să am un proces continuu, responsiv: textul criptat s-ar schimba imedi
 
 ### Compilarea lentă
 
-Una din probleme pe care le-am întâlnit era compilarea prea lentă (30+ de secunde). Cauza era că header-urile lui gtkmm sunt destul de masive (însă nu am cifre concrete). Eu compilam de fiecare dată de la zero, fiecare .cpp fișier aparte, și deci fiecare header utilizat era inclus și procesat de mai multe ori (linkarea nu lua mult timp, însuși compilarea fișierilor lua prea lung). Însă când am început să compilez toate aceste fișiere legate de gui aparte, cam în mod de mai jos, compilarea a devenit suportabilă (până la 10 secunde). S-ar putea face așa numit incremental build, însă nu știu cum să-l setez. Probabil este destul de ușor lucrul acesta în cmake. Am să studiez acest lucru cândva pe urmă.
+Una din probleme pe care le-am întâlnit era compilarea prea lentă (30+ de secunde). Cauza era că header-urile lui gtkmm sunt destul de masive (însă nu am cifre concrete). Eu compilam de fiecare dată de la zero, fiecare .cpp fișier aparte, și deci fiecare header utilizat era inclus și procesat de mai multe ori (linkarea nu lua mult timp, însuși compilarea fișierilor lua prea lung). Însă când am început să compilez toate aceste fișiere legate de gui deodată, cam în mod de mai jos, compilarea a devenit suportabilă (până la 10 secunde). S-ar putea face așa numit incremental build, însă nu știu cum să-l setez. Probabil este destul de ușor lucrul acesta în cmake. Am să studiez acest lucru cândva pe urmă.
 
 ```cpp
 // main.cpp
