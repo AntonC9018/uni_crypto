@@ -63,7 +63,7 @@ Evident, eu dealoc memoria string-urilor mele cu `free()`. În acest exemplu, av
 
 Niciodată nu am folosit instrumente pentru găsirea memory leak-urilor. 
 
-1. Se recomandă `Valgrand`, dar el este numai pentru Linux.
+1. Se recomandă `Valgrind`, dar el este numai pentru Linux.
 
 2. Mai este recomandat `UDMH`, dar el lucrează numai cu .pdb fișieri debug. .pdb este format de proprietate a lui Microsoft și este generat numai cu instrumentele Microsoft, însă eu utilizez (și probabil trebuie să utilizez) compilatorul GNU. Altfel nu pot compila gtkmm-ul.
 
