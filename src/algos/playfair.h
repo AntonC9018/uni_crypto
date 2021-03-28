@@ -90,7 +90,6 @@ namespace Playfair
 
     std::vector<Digram> make_encryption_digrams(str_view_t message, const Key& key, char subst_char = 'X')
     {
-        size_t i = 0;
         std::vector<Digram> result;
 
         for (size_t i = 0; i < message.length; i += 2)
@@ -103,7 +102,7 @@ namespace Playfair
             result.push_back({ key.mapf(message.chars[i]), key.mapf(message.chars[i + 1]) });
         }
 
-        return std::move(result);
+        return result;
     }
 
     // Assumes the length of message is even
@@ -115,7 +114,7 @@ namespace Playfair
         {
             result.push_back({ message.chars[i], message.chars[i + 1] });
         }
-        return std::move(result);
+        return result;
     }
 
     // If dir == 1,  the rules for encryption are applied 

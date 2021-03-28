@@ -85,9 +85,9 @@ namespace Caesar
     str_t make_decryption_key(str_view_t encryption_key)
     {
         str_t decryption_key = str_make(LATIN_LENGTH);
-        for (char i = 0; i < decryption_key.length; i++)
+        for (u8 i = 0; i < decryption_key.length; i++)
         {
-            char index = encryption_key[i] - FIRST_CHARACTER;
+            u8 index = encryption_key[i] - FIRST_CHARACTER;
             decryption_key[index] = i + FIRST_CHARACTER;
         }
         return decryption_key;

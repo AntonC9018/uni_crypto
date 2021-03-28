@@ -1,6 +1,7 @@
 #include "window.h"
 
 MainWindow::MainWindow()
+    : m_MainMessage("Select an algorithm from the pads above")
 {
     add(m_AlgoWindows);
     m_AlgoWindows.append_page(m_MainMessage, "Main Page");

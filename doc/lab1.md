@@ -1,4 +1,4 @@
-# Laborator 1
+# Laborator 1 la Criptografie
 
 A realizat: **Curmanschii Anton, IA1901**.
 

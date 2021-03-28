@@ -2,6 +2,7 @@
 #include <gtkmm/widget.h>
 #include <gtkmm/grid.h>
 #include <gtkmm/entry.h>
+#include <gtkmm/textbuffer.h>
 #include <gtkmm/label.h>
 #include <cairomm/fontoptions.h>
 #include <strlib.h>
