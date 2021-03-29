@@ -2,12 +2,14 @@
 #include <mydefines.h>
 #include <strlib.h>
 #include <gtkmm/application.h>
-#include "classic/gui/window.h"
+#include "modern/gui/window.h"
+
+
 
 int main()
 {
     auto app = Gtk::Application::create("cryto.demo.app");
-    MainWindow window;
+    ModernMainWindow window;
     int status = app->run(window);
     printf("Error code: %i", status);
     return status;

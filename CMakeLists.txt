@@ -42,6 +42,14 @@ set(SOURCES
     src/classic/algos/shift.cpp 
     src/classic/algos/straddling.cpp 
     src/classic/algos/vigenere.cpp
+
+    src/modern/gui/window.cpp
+    src/modern/gui/salsa20.cpp
+    src/modern/gui/trivium.cpp
+    src/modern/gui/rjindael.cpp
+
+    src/modern/algos/salsa20.cpp
+
     
     third_party/strlib/strlib.cpp)
 
