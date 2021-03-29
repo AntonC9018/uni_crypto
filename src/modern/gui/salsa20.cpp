@@ -70,7 +70,7 @@ Salsa20Box::Salsa20Box()
         sigc::mem_fun(*this, Salsa20Box::changed_message_text)
     );
     m_PlainTextView.set_buffer(m_refPlainTextBuffer);
-    m_PlainTextView.set_wrap_mode(Gtk::WRAP_WORD);
+    m_PlainTextView.set_wrap_mode(Gtk::WRAP_WORD_CHAR);
 
     m_EncryptedTextLabel.set_text("Encrypted Message (in base64)");
     m_refEncryptedTextBuffer = Gtk::TextBuffer::create();
@@ -78,7 +78,7 @@ Salsa20Box::Salsa20Box()
         sigc::mem_fun(*this, Salsa20Box::changed_encrypted_text)
     );
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
-    m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD);
+    m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD_CHAR);
 
     encrypt();
 
