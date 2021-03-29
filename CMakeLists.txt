@@ -14,6 +14,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 link_directories(${GTKMM_LIBRARY_DIRS})
+
 include_directories(
     crypto PUBLIC
     ${GTKMM_INCLUDE_DIRS} 
@@ -25,22 +26,22 @@ include_directories(
 set(SOURCES
 
     src/main.cpp
-    src/shared.cpp
-    src/abc.cpp
+    src/shared/util.cpp
+    src/shared/abc.cpp
 
-    src/gui/bazeries.cpp 
-    src/gui/common.cpp 
-    src/gui/shift.cpp 
-    src/gui/straddling.cpp 
-    src/gui/vigenere.cpp 
-    src/gui/window.cpp 
+    src/classic/gui/bazeries.cpp 
+    src/classic/gui/common.cpp 
+    src/classic/gui/shift.cpp 
+    src/classic/gui/straddling.cpp 
+    src/classic/gui/vigenere.cpp 
+    src/classic/gui/window.cpp 
 
-    src/algos/bazeries.cpp 
-    src/algos/affine.cpp 
-    src/algos/polybios.cpp 
-    src/algos/shift.cpp 
-    src/algos/straddling.cpp 
-    src/algos/vigenere.cpp
+    src/classic/algos/bazeries.cpp 
+    src/classic/algos/affine.cpp 
+    src/classic/algos/polybios.cpp 
+    src/classic/algos/shift.cpp 
+    src/classic/algos/straddling.cpp 
+    src/classic/algos/vigenere.cpp
     
     third_party/strlib/strlib.cpp)
 

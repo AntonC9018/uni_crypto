@@ -7,7 +7,7 @@
 
 #include <mydefines.h>
 #include <strlib.h>
-#include "../shared.h"
+#include <shared/util.h>
 
 namespace Affine
 {

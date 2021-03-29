@@ -1,6 +1,6 @@
 #pragma once
 #include <strlib.h>
-#include "shared.h"
+#include "util.h"
 
 namespace Abc
 {

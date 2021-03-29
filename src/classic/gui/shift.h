@@ -9,7 +9,7 @@
 #include "../algos/shift.h"
 #include "../algos/common.h"
 #include "common.h"
-#include "../logger.h"
+#include <shared/logger.h>
 
 class ShiftBox : public Gtk::Box
 {

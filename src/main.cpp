@@ -1,29 +1,12 @@
 #include <stdio.h>
 #include <mydefines.h>
-#include "algos/caesar.h"
-#include "algos/affine.h"
-#include "algos/straddling.h"
-#include "algos/playfair.h"
-#include "algos/shift.h"
-#include "algos/vigenere.h"
-#include "algos/bazeries.h"
 #include <strlib.h>
 #include <gtkmm/application.h>
-#include "gui/window.h"
-
-// I assume it compiles for a billion years each time 
-// due to the megabytes heavy gtkmm headers.
-// UPDATE: It definitely does
-// #include "gui/window.cpp"
-// #include "gui/bazeries.cpp"
-// #include "gui/common.cpp"
-// #include "gui/shift.cpp"
-// #include "gui/straddling.cpp"
-// #include "gui/vigenere.cpp"
+#include "classic/gui/window.h"
 
 int main()
 {
-    auto app = Gtk::Application::create("org.gtkmm.example");
+    auto app = Gtk::Application::create("cryto.demo.app");
     MainWindow window;
     int status = app->run(window);
     printf("Error code: %i", status);

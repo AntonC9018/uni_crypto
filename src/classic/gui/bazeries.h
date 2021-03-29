@@ -10,9 +10,10 @@
 #include <strlib.h>
 #include "../algos/bazeries.h"
 #include "../algos/common.h"
-#include "../shared.h"
+#include <shared/util.h>
 #include "common.h"
-#include "../logger.h"
+#include <shared/logger.h>
+
 
 struct Message
 {

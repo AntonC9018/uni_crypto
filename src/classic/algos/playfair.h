@@ -2,8 +2,8 @@
 #include <map>
 #include <vector>
 #include "polybios.h"
-#include "../shared.h"
-#include "../abc.h"
+#include <shared/util.h>
+#include <shared/abc.h>
 #include "common.h"
 
 namespace Playfair

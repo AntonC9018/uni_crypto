@@ -3,8 +3,8 @@
 #include <vector>
 
 #include <mydefines.h>
-#include "../shared.h"
-#include "../abc.h"
+#include <shared/util.h>
+#include <shared/abc.h>
 
 
 namespace Polybios

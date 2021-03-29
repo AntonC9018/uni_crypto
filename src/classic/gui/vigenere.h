@@ -8,7 +8,8 @@
 #include <strlib.h>
 #include "../algos/vigenere.h"
 #include "common.h"
-#include "../logger.h"
+#include <shared/logger.h>
+
 
 class VigenereBox : public Gtk::Box
 {

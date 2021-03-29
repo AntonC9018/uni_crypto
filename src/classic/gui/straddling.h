@@ -10,7 +10,7 @@
 #include <strlib.h>
 #include "../algos/straddling.h"
 #include "../algos/common.h"
-#include "../shared.h"
+#include <shared/util.h>
 #include "common.h"
 
 class StraddlingBox : public Gtk::Box

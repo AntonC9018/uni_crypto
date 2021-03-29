@@ -7,8 +7,8 @@
 #include <vector>
 #include <map>
 
-#include "../shared.h"
-#include "../logger.h"
+#include <shared/util.h>
+#include <shared/logger.h>
 
 
 namespace Straddling

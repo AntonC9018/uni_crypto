@@ -1,7 +1,7 @@
 #pragma once
 #include <string.h>
 #include <stdlib.h>
-#include "../shared.h"
+#include <shared/util.h>
 
 namespace Caesar
 {

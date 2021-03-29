@@ -7,9 +7,9 @@
 #include <vector>
 
 #include <mydefines.h>
-#include "../shared.h"
+#include <shared/util.h>
 #include "polybios.h"
-#include "../abc.h"
+#include <shared/abc.h>
 #include "common.h"
 
 
