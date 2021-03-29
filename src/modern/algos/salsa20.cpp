@@ -136,7 +136,7 @@ static void salsa20_crypt(
     u8 nonce_and_stream_index[4 * 4];
 
     memcpy(nonce_and_stream_index, nonce, 8);
-    memset(&nonce_and_stream_index[8], 0, 4);
+    memset(&nonce_and_stream_index[12], 0, 4);
 
     for (u32 i = 0; i < buffer_length; i++) 
     {
@@ -146,7 +146,7 @@ static void salsa20_crypt(
         if (keystream_index == 0) 
         {
             u32 block_number = (stream_index + i) / 64;
-            memcpy(&nonce_and_stream_index[12], &block_number, 4);
+            memcpy(&nonce_and_stream_index[8], &block_number, 4);
             (*expand)(key, nonce_and_stream_index, keystream);
         }
 
