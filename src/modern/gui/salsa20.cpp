@@ -141,7 +141,7 @@ Glib::ustring Salsa20Box::crypt(const Glib::ustring& buffer)
 {
     auto key_string = m_refKeywordBuffer->get_text();
     auto nonce = m_refNonceBuffer->get_text();
-    auto base64_decoded = Glib::Base64::decode(buffer.c_str());
+    auto base64_decoded = Glib::Base64::decode(buffer);
     auto num_bytes = base64_decoded.size();
 
     auto func = m_16ByteRadioButton.get_active() ? &salsa20_crypt16 : &salsa20_crypt32;
