@@ -93,8 +93,8 @@ static void salsa20_expand16(u8 key[16], u8 nonce_and_stream_index[16], u8 keyst
 
         To me, this is way clearer with a memcpy.
     */
-    memcpy(&keystream[ 1 * 4], key,     4 * 4); 
-    memcpy(&keystream[11 * 4], &key[4], 4 * 4); 
+    memcpy(&keystream[ 1 * 4], key, 4 * 4); 
+    memcpy(&keystream[11 * 4], key, 4 * 4); 
     memcpy(&keystream[ 6 * 4], nonce_and_stream_index, 4 * 4);
 
     salsa20_block((u32*)keystream);

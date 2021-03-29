@@ -80,6 +80,8 @@ Salsa20Box::Salsa20Box()
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
     m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD);
 
+    encrypt();
+
     logger_attach(&logger, this);
 }
     
@@ -144,12 +146,10 @@ Glib::ustring Salsa20Box::crypt(const Glib::ustring& buffer)
 
     auto func = m_16ByteRadioButton.get_active() ? &salsa20_crypt16 : &salsa20_crypt32;
 
-    printf("Selected %i\n", m_16ByteRadioButton.get_active() ? 16 : 32);
-    
     (*func)((u8*)key_string.data(), 
          (u8*)nonce.data(), 
          (u8*)base64_decoded.data(), 
-         num_bytes);
+         (u32)num_bytes);
 
     return Glib::Base64::encode(base64_decoded);
 }
