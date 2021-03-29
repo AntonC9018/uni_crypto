@@ -127,8 +127,8 @@ static void salsa20_expand32(u8 key[32], u8 nonce_and_stream_index[16], u8 keyst
 }
 
 // This function expects a little endian system
-void salsa20_crypt16(
-    u8 key_16_byte[16], u8 nonce[8], 
+static void salsa20_crypt(
+    u8* key, u8 nonce[8], decltype(salsa20_expand32) *expand,
     u8 *input_output_buffer, u32 buffer_length)
 {
     u32 stream_index = 0;
@@ -147,7 +147,7 @@ void salsa20_crypt16(
         {
             u32 block_number = (stream_index + i) / 64;
             memcpy(&nonce_and_stream_index[8], &block_number, 4);
-            salsa20_expand16(key_16_byte, nonce_and_stream_index, keystream);
+            (*expand)(key, nonce_and_stream_index, keystream);
         }
 
         // xor one byte of plaintext with one byte of keystream
@@ -155,32 +155,17 @@ void salsa20_crypt16(
     }
 }
 
+void salsa20_crypt16(
+    u8 key_16_byte[16], u8 nonce[8], 
+    u8 *input_output_buffer, u32 buffer_length)
+{
+    return salsa20_crypt(key_16_byte, nonce, &salsa20_expand16, input_output_buffer, buffer_length);
+}
 
-// This function expects a little endian system
+
 void salsa20_crypt32(
     u8 key_32_byte[32], u8 nonce[8], 
     u8 *input_output_buffer, u32 buffer_length)
 {
-    u32 stream_index = 0;
-    u8 keystream[64];
-    u8 nonce_and_stream_index[4 * 4];
-
-    memcpy(nonce_and_stream_index, nonce, 8);
-    memset(&nonce_and_stream_index[12], 0, 4);
-
-    for (u32 i = 0; i < buffer_length; i++) 
-    {
-        int keystream_index = (stream_index + i) % 64;
-
-        // Looped back or just started, gotta refresh the keystream
-        if (keystream_index == 0) 
-        {
-            u32 block_number = (stream_index + i) / 64;
-            memcpy(&nonce_and_stream_index[8], &block_number, 4);
-            salsa20_expand32(key_32_byte, nonce_and_stream_index, keystream);
-        }
-
-        // xor one byte of plaintext with one byte of keystream
-        input_output_buffer[i] ^= keystream[keystream_index];
-    }
+    return salsa20_crypt(key_32_byte, nonce, &salsa20_expand32, input_output_buffer, buffer_length);
 }
