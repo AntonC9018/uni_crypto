@@ -80,7 +80,7 @@ Salsa20Box::Salsa20Box()
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
     m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD_CHAR);
 
-    encrypt();
+    changed_message_text();
 
     logger_attach(&logger, this);
 }
@@ -177,7 +177,7 @@ void Salsa20Box::validate()
     if (num_nonce_bytes < 8)
     {
         logger_format_error(&logger, 
-            "Not enough bytes in the nonce (%i). Must be at least 8.", num_nonce_bytes);
+            "Not enough bytes in the nonce (%i). Must be at least 8.\n", num_nonce_bytes);
     }
     // else if (num_nonce_bytes > 8)
     // {
@@ -191,7 +191,7 @@ void Salsa20Box::validate()
     if (num_keyword_bytes < required_num_bytes)
     {
         logger_format_error(&logger, 
-            "Not enough bytes in the keyword (%i). Must be at least %i.", 
+            "Not enough bytes in the keyword (%i). Must be at least %i.\n", 
             num_keyword_bytes, required_num_bytes);
     }
     // else if (num_keyword_bytes > required_num_bytes)

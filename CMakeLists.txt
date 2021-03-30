@@ -49,6 +49,7 @@ set(SOURCES
     src/modern/gui/rjindael.cpp
 
     src/modern/algos/salsa20.cpp
+    src/modern/algos/trivium.cpp
 
     
     third_party/strlib/strlib.cpp)

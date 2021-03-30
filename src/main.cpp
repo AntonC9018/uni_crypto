@@ -4,7 +4,7 @@
 #include <gtkmm/application.h>
 #include "modern/gui/window.h"
 
-
+#include "modern/algos/trivium.h"
 
 int main()
 {

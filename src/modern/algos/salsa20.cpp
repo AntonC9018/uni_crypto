@@ -10,10 +10,11 @@
 	a ^= rotate_left(d + c,18))
 #define ROUNDS 20
  
+
 static void salsa20_block(u32 x[16])
 {
 	u32 array_copy[16];
-
+    
     // If we're on a little endian machine, nothing to be done.
     // If we're on a big endian machine, we have to shift our perspective as though
     // we were on a little endian machine.
