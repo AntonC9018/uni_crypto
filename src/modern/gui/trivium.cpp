@@ -40,7 +40,7 @@ TriviumBox::TriviumBox()
         sigc::mem_fun(*this, TriviumBox::changed_keyword_text)
     );
 
-    m_InitializationVectorLabel.set_text("InitializationVector ");
+    m_InitializationVectorLabel.set_text("Initialization Vector ");
     m_refInitializationVectorBuffer = m_InitializationVectorEntry.get_buffer();
     m_InitializationVectorEntry.set_text("1234567890");
     m_InitializationVectorEntry.signal_changed().connect(

@@ -3,7 +3,7 @@
 #include <gtkmm/notebook.h>
 #include "trivium.h"
 #include "salsa20.h"
-#include "rjindael.h"
+#include "rijndael.h"
 
 class ModernMainWindow : public Gtk::Window
 {
@@ -16,5 +16,5 @@ private:
     Gtk::Label m_MainMessage;
     Salsa20Box m_Salsa20Box;
     TriviumBox m_TriviumBox;
-    RjindaelBox m_RjindaelBox;
+    RijndaelBox m_RijndaelBox;
 };

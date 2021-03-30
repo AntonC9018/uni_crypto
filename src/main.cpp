@@ -4,10 +4,15 @@
 #include <gtkmm/application.h>
 #include "modern/gui/window.h"
 
-#include "modern/algos/trivium.h"
-
 int main()
 {
+    // u8 str[33] = "12345678901234567890123456789012";
+    // u8 key[17] = "1234567890123456";
+    // rijndael_encrypt(AES_CYPHER_128, key, str, 32);
+    // puts((char*)str);
+    // rijndael_decrypt(AES_CYPHER_128, key, str, 32);
+    // puts((char*)str);
+
     auto app = Gtk::Application::create("cryto.demo.app");
     ModernMainWindow window;
     int status = app->run(window);

@@ -18,3 +18,11 @@ inline u32 to_u32_little_endian(u8* bytes)
         ((u32)bytes[2] << 16) |
         ((u32)bytes[3] << 24);
 }
+
+inline u32 to_u32_little_endian(const u8* bytes)
+{
+    return (u32)bytes[0]      |
+        ((u32)bytes[1] << 8)  | 
+        ((u32)bytes[2] << 16) |
+        ((u32)bytes[3] << 24);
+}

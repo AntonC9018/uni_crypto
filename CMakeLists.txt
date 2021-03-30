@@ -46,10 +46,11 @@ set(SOURCES
     src/modern/gui/window.cpp
     src/modern/gui/salsa20.cpp
     src/modern/gui/trivium.cpp
-    src/modern/gui/rjindael.cpp
+    src/modern/gui/rijndael.cpp
 
     src/modern/algos/salsa20.cpp
     src/modern/algos/trivium.cpp
+    src/modern/algos/rijndael.cpp
 
     
     third_party/strlib/strlib.cpp)
