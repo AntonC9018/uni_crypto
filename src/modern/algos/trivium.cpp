@@ -5,9 +5,7 @@
 
 inline u8 bit_at(u8 _byte, u32 position)
 {
-    u8 mask = 1 << position;
-    u8 t = _byte & mask;
-    return t >> position;
+    return (_byte >> position) & 1;
 }
 
 inline u8 bit(u8 s[36], u32 position)
@@ -16,12 +14,6 @@ inline u8 bit(u8 s[36], u32 position)
     u8 bit_index   = position % 8;
     return bit_at(s[byte_index], bit_index);
 }
-
-// inline u8 set_bit_at(u8 _byte, u8 position, u8 bit)
-// {
-//     u8 bit_shifted_to_the_right_position = bit >> position;
-//     return _byte | bit_shifted_to_the_right_position;
-// }
 
 inline void set_bit(u8 s[36], u32 position, u8 bit)
 {
@@ -49,8 +41,6 @@ inline void rotate_state_right_by_one(u8 s[36])
 {
     rotate_bytes_right(s, 36, 1);
 }
-
-// #define GET_BIT(_byte, position) (((_byte) & (1 >> (position)) << (position))
 
 static void initialize(u8 s[36], u8 key[10], u8 ivector[10])
 {

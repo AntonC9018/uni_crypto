@@ -234,9 +234,6 @@ inline void add_round_key(u8 *state, u8 *round_keys, size_t round)
     }
 }
 
-
-#define aeq(arr_1, arr_2, len) for(int i = 0; i < len; i++) assert(arr_1[i] == arr_2[i]);
-
 void rijndael_encrypt(AES_CYPHER_T mode, const u8* key, 
     u8* input_output_buffer, const size_t buffer_length)
 {
