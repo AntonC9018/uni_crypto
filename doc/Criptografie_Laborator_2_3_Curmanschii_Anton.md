@@ -488,10 +488,10 @@ Verificăm și proprietatea de difuzie: schimbăm un caracer din șirul de intra
 ![2](image/aes_dependence_1.png)
 ![1](image/aes_dependence_2.png)
 
-Algoritmul mai include mai multe moduri de generare a secvenței de ieșire: unul mai folosește un vector de inițializare, altul utilizează la criptare biții primiți anterior, etc. Eu am realizat doar ce mai simplă varianta, unde fiecare bloc este criptat independent de celelalte, însă codul pentru celelalte moduri ar fi asemănător (literalmente ar trebui să adaug 5 rânduri de cod pentru fiecare).
+Algoritmul mai include mai multe moduri de generare a secvenței de ieșire: unul mai folosește un vector de inițializare, altul utilizează la criptare biții primiți anterior, etc. Eu am realizat doar cea mai simplă varianta, unde fiecare bloc este criptat independent de celelalte, însă codul pentru celelalte moduri ar fi asemănător (literalmente ar trebui să adaug 5 rânduri de cod pentru fiecare).
 
 ## Concluzii
 
 Plusul la implementare este faptul că la criptare sunt utilizate numai operațiile pe mai multe octeți, sau în scopul octeților, dar nu între biții diferitor octeți. Acest lucru simplifică procesul de gândire referitor la faptul dacă mașina este big sau little endian.
 
-În general, pot spune că Rijndael o obținut obiectivul său și nu degeabă a devenit standartul avansat de criptare.
+În general, pot spune că Rijndael a obținut obiectivul său și nu degeabă a devenit standartul avansat de criptare.
