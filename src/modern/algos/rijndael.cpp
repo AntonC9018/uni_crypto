@@ -281,7 +281,7 @@ static void inv_shift_rows(u8 *state)
         for (j = 0; j < 4 - i; j++) 
         {
             u8 tmp = s[i];
-            for (r = 0; r < 4; r++) 
+            for (r = 0; r < 3; r++) 
             {
                 s[i + r * 4] = s[i + (r + 1) * 4];
             }
