@@ -1,16 +1,15 @@
 #pragma once
-#include <gtkmm/window.h>
+#include <gtkmm/box.h>
 #include <gtkmm/notebook.h>
 #include "shift.h"
 #include "straddling.h"
 #include "vigenere.h"
 #include "bazeries.h"
 
-class MainWindow : public Gtk::Window
+class ClassicAlgorithmsPage : public Gtk::Box
 {
 public:
-    MainWindow();
-    virtual ~MainWindow();
+    ClassicAlgorithmsPage();
 
 private:
     Gtk::Notebook m_AlgoWindows;

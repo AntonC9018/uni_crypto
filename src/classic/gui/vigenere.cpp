@@ -40,7 +40,7 @@ VigenereBox::VigenereBox()
     
     m_KeywordEntry.set_text("BATTISTA");
     m_KeywordEntry.signal_changed().connect(
-        sigc::mem_fun(*this, VigenereBox::changed_keyword)
+        sigc::mem_fun(*this, &VigenereBox::changed_keyword)
     );
 
     m_UsageHeader.set_markup("<u><b>Usage</b></u>");
@@ -52,7 +52,7 @@ VigenereBox::VigenereBox()
     m_refPlainTextBuffer = Gtk::TextBuffer::create();
     m_refPlainTextBuffer->set_text("ASIMPLEEXAMPLE");
     m_refPlainTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, VigenereBox::changed_message_text)
+        sigc::mem_fun(*this, &VigenereBox::changed_message_text)
     );
     m_PlainTextView.set_buffer(m_refPlainTextBuffer);
     m_PlainTextView.set_wrap_mode(Gtk::WRAP_WORD);
@@ -60,7 +60,7 @@ VigenereBox::VigenereBox()
     m_EncryptedTextLabel.set_text("Encrypted Message");
     m_refEncryptedTextBuffer = Gtk::TextBuffer::create();
     m_refEncryptedTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, VigenereBox::changed_encrypted_text)
+        sigc::mem_fun(*this, &VigenereBox::changed_encrypted_text)
     );
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
     m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD);

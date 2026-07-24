@@ -45,7 +45,7 @@ RijndaelBox::RijndaelBox()
     m_refKeywordBuffer = m_KeywordEntry.get_buffer();
     m_KeywordEntry.set_text("1234567890123456");
     m_KeywordEntry.signal_changed().connect(
-        sigc::mem_fun(*this, RijndaelBox::changed_keyword_text)
+        sigc::mem_fun(*this, &RijndaelBox::changed_keyword_text)
     );
 
     m_ModeLabel.set_text("Mode ");
@@ -57,20 +57,20 @@ RijndaelBox::RijndaelBox()
     m_128ModeRadioButton.set_active(true);
 
     m_128ModeRadioButton.signal_toggled().connect(
-        sigc::mem_fun(*this, RijndaelBox::changed_mode)
+        sigc::mem_fun(*this, &RijndaelBox::changed_mode)
     );
     m_192ModeRadioButton.signal_toggled().connect(
-        sigc::mem_fun(*this, RijndaelBox::changed_mode)
+        sigc::mem_fun(*this, &RijndaelBox::changed_mode)
     );
     m_256ModeRadioButton.signal_toggled().connect(
-        sigc::mem_fun(*this, RijndaelBox::changed_mode)
+        sigc::mem_fun(*this, &RijndaelBox::changed_mode)
     );
 
     m_PlainTextLabel.set_text("Plain Message (in base64)");
     m_refPlainTextBuffer = Gtk::TextBuffer::create();
     m_refPlainTextBuffer->set_text("123456789012345678901234");
     m_refPlainTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, RijndaelBox::changed_message_text)
+        sigc::mem_fun(*this, &RijndaelBox::changed_message_text)
     );
     m_PlainTextView.set_buffer(m_refPlainTextBuffer);
     m_PlainTextView.set_wrap_mode(Gtk::WRAP_WORD_CHAR);
@@ -78,7 +78,7 @@ RijndaelBox::RijndaelBox()
     m_EncryptedTextLabel.set_text("Encrypted Message (in base64)");
     m_refEncryptedTextBuffer = Gtk::TextBuffer::create();
     m_refEncryptedTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, RijndaelBox::changed_encrypted_text)
+        sigc::mem_fun(*this, &RijndaelBox::changed_encrypted_text)
     );
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
     m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD_CHAR);

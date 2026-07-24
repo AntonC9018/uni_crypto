@@ -1,59 +1,65 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.21)
 
-project(crypto LANGUAGES CXX)
+project(crypto VERSION 1.0.0 LANGUAGES CXX)
 
-find_package(PkgConfig)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTKMM REQUIRED IMPORTED_TARGET gtkmm-3.0)
 
-pkg_check_modules(GTKMM gtkmm-3.0)
-# Now the variables GTKMM_INCLUDE_DIRS, GTKMM_LIBRARY_DIRS and GTKMM_LIBRARIES 
-# contain what you expect 
-
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -static-libstdc++")
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-link_directories(${GTKMM_LIBRARY_DIRS})
-
-include_directories(
-    crypto PUBLIC
-    ${GTKMM_INCLUDE_DIRS} 
-    third_party/mydefines
-    third_party/strlib
-    src
+file(GLOB_RECURSE CRYPTO_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-set(SOURCES
+add_executable(crypto
+    ${CRYPTO_SOURCES}
+    third_party/strlib/strlib.cpp
+)
 
-    src/main.cpp
-    src/shared/util.cpp
-    src/shared/abc.cpp
+target_compile_features(crypto PRIVATE cxx_std_17)
+target_compile_options(crypto PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra>
+)
+target_include_directories(crypto PRIVATE
+    src
+    third_party/mydefines
+    third_party/strlib
+)
+target_link_libraries(crypto PRIVATE PkgConfig::GTKMM)
 
-    src/classic/gui/bazeries.cpp 
-    src/classic/gui/common.cpp 
-    src/classic/gui/shift.cpp 
-    src/classic/gui/straddling.cpp 
-    src/classic/gui/vigenere.cpp 
-    src/classic/gui/window.cpp 
+if(MINGW)
+    target_link_options(crypto PRIVATE -static-libgcc -static-libstdc++)
+endif()
 
-    src/classic/algos/bazeries.cpp 
-    src/classic/algos/affine.cpp 
-    src/classic/algos/polybios.cpp 
-    src/classic/algos/shift.cpp 
-    src/classic/algos/straddling.cpp 
-    src/classic/algos/vigenere.cpp
+add_custom_target(run
+    COMMAND $<TARGET_FILE:crypto>
+    DEPENDS crypto
+    USES_TERMINAL
+)
 
-    src/modern/gui/window.cpp
-    src/modern/gui/salsa20.cpp
-    src/modern/gui/trivium.cpp
-    src/modern/gui/rijndael.cpp
+if(WIN32)
+    install(TARGETS crypto
+        RUNTIME_DEPENDENCY_SET crypto_runtime_dependencies
+        RUNTIME DESTINATION .
+    )
+    install(RUNTIME_DEPENDENCY_SET crypto_runtime_dependencies
+        DESTINATION .
+        PRE_EXCLUDE_REGEXES
+            "api-ms-win-.*"
+            "ext-ms-win-.*"
+        POST_EXCLUDE_REGEXES
+            ".*[\\\\/]Windows[\\\\/]System32[\\\\/].*"
+    )
+    set(CPACK_PACKAGE_FILE_NAME "crypto-windows")
+else()
+    install(TARGETS crypto RUNTIME DESTINATION .)
+    set(CPACK_PACKAGE_FILE_NAME "crypto-${CMAKE_SYSTEM_NAME}")
+endif()
 
-    src/modern/algos/salsa20.cpp
-    src/modern/algos/trivium.cpp
-    src/modern/algos/rijndael.cpp
+install(FILES LICENSE DESTINATION .)
 
-    
-    third_party/strlib/strlib.cpp)
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+set(CPACK_PACKAGE_NAME "crypto")
+set(CPACK_PACKAGE_VENDOR "Anton Curmanschii")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 
-add_executable(crypto ${SOURCES})
-target_link_libraries(crypto ${GTKMM_LIBRARIES})
+include(CPack)

@@ -37,21 +37,21 @@ TriviumBox::TriviumBox()
     m_refKeywordBuffer = m_KeywordEntry.get_buffer();
     m_KeywordEntry.set_text("1234567890");
     m_KeywordEntry.signal_changed().connect(
-        sigc::mem_fun(*this, TriviumBox::changed_keyword_text)
+        sigc::mem_fun(*this, &TriviumBox::changed_keyword_text)
     );
 
     m_InitializationVectorLabel.set_text("Initialization Vector ");
     m_refInitializationVectorBuffer = m_InitializationVectorEntry.get_buffer();
     m_InitializationVectorEntry.set_text("1234567890");
     m_InitializationVectorEntry.signal_changed().connect(
-        sigc::mem_fun(*this, TriviumBox::changed_ivector_text)
+        sigc::mem_fun(*this, &TriviumBox::changed_ivector_text)
     );
 
     m_PlainTextLabel.set_text("Plain Message (in base64)");
     m_refPlainTextBuffer = Gtk::TextBuffer::create();
     m_refPlainTextBuffer->set_text("AAAAAAAAAAAA");
     m_refPlainTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, TriviumBox::changed_message_text)
+        sigc::mem_fun(*this, &TriviumBox::changed_message_text)
     );
     m_PlainTextView.set_buffer(m_refPlainTextBuffer);
     m_PlainTextView.set_wrap_mode(Gtk::WRAP_WORD_CHAR);
@@ -59,7 +59,7 @@ TriviumBox::TriviumBox()
     m_EncryptedTextLabel.set_text("Encrypted Message (in base64)");
     m_refEncryptedTextBuffer = Gtk::TextBuffer::create();
     m_refEncryptedTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, TriviumBox::changed_encrypted_text)
+        sigc::mem_fun(*this, &TriviumBox::changed_encrypted_text)
     );
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
     m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD_CHAR);
