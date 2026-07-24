@@ -19,7 +19,7 @@ public:
 private:
 
     // Algorithm Logic
-    bool m_ignoreTextInput;
+    bool m_ignoreTextInput = false;
 
     // Layout Stuff
     // Key

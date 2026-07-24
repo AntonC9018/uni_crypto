@@ -19,7 +19,7 @@ public:
 private:
 
     // Algorithm Logic
-    bool m_ignoreTextInput;
+    bool m_ignoreTextInput = false;
 
     enum Mode { _16_BYTE, _32_BYTE };
 
