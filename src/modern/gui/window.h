@@ -1,15 +1,14 @@
 #pragma once
-#include <gtkmm/window.h>
+#include <gtkmm/box.h>
 #include <gtkmm/notebook.h>
 #include "trivium.h"
 #include "salsa20.h"
 #include "rijndael.h"
 
-class ModernMainWindow : public Gtk::Window
+class ModernAlgorithmsPage : public Gtk::Box
 {
 public:
-    ModernMainWindow();
-    virtual ~ModernMainWindow();
+    ModernAlgorithmsPage();
 
 private:
     Gtk::Notebook m_AlgoWindows;

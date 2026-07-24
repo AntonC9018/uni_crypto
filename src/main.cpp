@@ -2,7 +2,7 @@
 #include <mydefines.h>
 #include <strlib.h>
 #include <gtkmm/application.h>
-#include "modern/gui/window.h"
+#include "gui/window.h"
 
 int main()
 {
@@ -13,8 +13,8 @@ int main()
     // rijndael_decrypt(AES_CYPHER_128, key, str, 32);
     // puts((char*)str);
 
-    auto app = Gtk::Application::create("cryto.demo.app");
-    ModernMainWindow window;
+    auto app = Gtk::Application::create("crypto.demo.app");
+    MainWindow window;
     int status = app->run(window);
     printf("Error code: %i", status);
     return status;
