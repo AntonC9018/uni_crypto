@@ -43,14 +43,14 @@ Salsa20Box::Salsa20Box()
     m_refKeywordBuffer = m_KeywordEntry.get_buffer();
     m_KeywordEntry.set_text("1234567890123456");
     m_KeywordEntry.signal_changed().connect(
-        sigc::mem_fun(*this, Salsa20Box::changed_keyword_text)
+        sigc::mem_fun(*this, &Salsa20Box::changed_keyword_text)
     );
 
     m_NonceLabel.set_text("Nonce ");
     m_refNonceBuffer = m_NonceEntry.get_buffer();
     m_NonceEntry.set_text("12345678");
     m_NonceEntry.signal_changed().connect(
-        sigc::mem_fun(*this, Salsa20Box::changed_nonce_text)
+        sigc::mem_fun(*this, &Salsa20Box::changed_nonce_text)
     );
 
     m_ModeLabel.set_text("Mode ");
@@ -60,14 +60,14 @@ Salsa20Box::Salsa20Box()
     m_16ByteRadioButton.set_active(true);
 
     m_16ByteRadioButton.signal_toggled().connect(
-        sigc::mem_fun(*this, Salsa20Box::changed_mode)
+        sigc::mem_fun(*this, &Salsa20Box::changed_mode)
     );
 
     m_PlainTextLabel.set_text("Plain Message (in base64)");
     m_refPlainTextBuffer = Gtk::TextBuffer::create();
     m_refPlainTextBuffer->set_text("AAAAAAAAAAAA");
     m_refPlainTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, Salsa20Box::changed_message_text)
+        sigc::mem_fun(*this, &Salsa20Box::changed_message_text)
     );
     m_PlainTextView.set_buffer(m_refPlainTextBuffer);
     m_PlainTextView.set_wrap_mode(Gtk::WRAP_WORD_CHAR);
@@ -75,7 +75,7 @@ Salsa20Box::Salsa20Box()
     m_EncryptedTextLabel.set_text("Encrypted Message (in base64)");
     m_refEncryptedTextBuffer = Gtk::TextBuffer::create();
     m_refEncryptedTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, Salsa20Box::changed_encrypted_text)
+        sigc::mem_fun(*this, &Salsa20Box::changed_encrypted_text)
     );
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
     m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD_CHAR);

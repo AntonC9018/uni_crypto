@@ -58,7 +58,7 @@ ShiftBox::ShiftBox()
     m_HeightButton.set_adjustment(m_HeightAdjustment);
     m_HeightButton.set_digits(0);
 
-    auto perm_entry_functor = sigc::mem_fun(*this, ShiftBox::changed_perm_entry);
+    auto perm_entry_functor = sigc::mem_fun(*this, &ShiftBox::changed_perm_entry);
 
     m_RowPermLable.set_text("Row Permutation");
     m_RowPermEntry.set_text("624153");
@@ -76,7 +76,7 @@ ShiftBox::ShiftBox()
     m_UsageHeader.set_margin_bottom(10);
     m_UsageHeader.set_size_request(400);
 
-    auto text_changed_functor = sigc::mem_fun(*this, ShiftBox::changed_text); 
+    auto text_changed_functor = sigc::mem_fun(*this, &ShiftBox::changed_text);
 
     m_PlainTextLabel.set_text("Plain Message");
     m_refPlainTextBuffer = Gtk::TextBuffer::create();

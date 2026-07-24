@@ -53,25 +53,25 @@ StraddlingBox::StraddlingBox()
     m_AlphabetCombo.append(latin_numbers_underscore.chars);
     m_AlphabetCombo.set_active(1);
     m_AlphabetCombo.signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::changed_alphabet)
+        sigc::mem_fun(*this, &StraddlingBox::changed_alphabet)
     );
 
     m_RowIndicesLabel.set_text("Row Indices");
     m_RowIndicesEntry.set_text("138");
     m_RowIndicesEntry.signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::changed_row_indices)
+        sigc::mem_fun(*this, &StraddlingBox::changed_row_indices)
     );
 
     m_ScrambleLabel.set_text("Scramble Word");
     m_ScrambleEntry.set_text("PLAYWRIGHT");
     m_ScrambleEntry.signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::changed_scramble)
+        sigc::mem_fun(*this, &StraddlingBox::changed_scramble)
     );
 
     m_KeywordLabel.set_text("Keyword");
     m_KeywordEntry.set_text("MURPHY_");
     m_KeywordEntry.signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::changed_keyword)
+        sigc::mem_fun(*this, &StraddlingBox::changed_keyword)
     );
 
     m_UsageHeader.set_markup("<u><b>Usage</b></u>");
@@ -83,7 +83,7 @@ StraddlingBox::StraddlingBox()
     m_refPlainTextBuffer = Gtk::TextBuffer::create();
     m_refPlainTextBuffer->set_text("CLOCKS_WILL_RUN_MORE_QUICKLY_DURING_FREE_TIME");
     m_refPlainTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::changed_message_text)
+        sigc::mem_fun(*this, &StraddlingBox::changed_message_text)
     );
     m_PlainTextView.set_buffer(m_refPlainTextBuffer);
     m_PlainTextView.set_wrap_mode(Gtk::WRAP_WORD);
@@ -91,7 +91,7 @@ StraddlingBox::StraddlingBox()
     m_EncryptedTextLabel.set_text("Encrypted Message");
     m_refEncryptedTextBuffer = Gtk::TextBuffer::create();
     m_refEncryptedTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::changed_encrypted_text)
+        sigc::mem_fun(*this, &StraddlingBox::changed_encrypted_text)
     );
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
     m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD);
@@ -99,15 +99,15 @@ StraddlingBox::StraddlingBox()
     m_refGroupLengthAdjustment = Gtk::Adjustment::create(5, 1, 10, 1, 1, 0);
     m_EncryptedDisplay_GroupLengthButton.set_adjustment(m_refGroupLengthAdjustment);
     m_EncryptedDisplay_GroupLengthButton.signal_changed().connect(
-        sigc::mem_fun(*this, StraddlingBox::changed_group_size)
+        sigc::mem_fun(*this, &StraddlingBox::changed_group_size)
     );
 
     m_EncryptedDisplay_ConcatenateButton.join_group(m_EncryptedDisplay_GroupsButton);
     m_EncryptedDisplay_GroupsButton.signal_clicked().connect(
-        sigc::mem_fun(*this, StraddlingBox::changed_show)
+        sigc::mem_fun(*this, &StraddlingBox::changed_show)
     );
     m_EncryptedDisplay_ConcatenateButton.signal_clicked().connect(
-        sigc::mem_fun(*this, StraddlingBox::changed_show)
+        sigc::mem_fun(*this, &StraddlingBox::changed_show)
     );
 
     m_TableGrid.set_row_homogeneous(true);

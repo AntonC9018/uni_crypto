@@ -47,13 +47,13 @@ BazeriesBox::BazeriesBox()
     m_KeywordLabel.set_text("Keyword");
     m_KeywordEntry.set_text("SEVENTHOUSANDTHREEHUNDREDANDFIFTYTWO");
     m_KeywordEntry.signal_changed().connect(
-        sigc::mem_fun(*this, BazeriesBox::changed_keyword)
+        sigc::mem_fun(*this, &BazeriesBox::changed_keyword)
     );
 
     m_NumericKeywordLabel.set_text("Numeric keyword");
     m_NumericKeywordEntry.set_text("7352");
     m_NumericKeywordEntry.signal_changed().connect(
-        sigc::mem_fun(*this, BazeriesBox::changed_numeric_keyword)
+        sigc::mem_fun(*this, &BazeriesBox::changed_numeric_keyword)
     );
 
     m_UsageHeader.set_markup("<u><b>Usage</b></u>");
@@ -65,7 +65,7 @@ BazeriesBox::BazeriesBox()
     m_refPlainTextBuffer = Gtk::TextBuffer::create();
     m_refPlainTextBuffer->set_text("ACLEARCONSCIENCEISUSUALLYTHESIGNOFABADMEMORY");
     m_refPlainTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, BazeriesBox::changed_message_text)
+        sigc::mem_fun(*this, &BazeriesBox::changed_message_text)
     );
     m_PlainTextView.set_buffer(m_refPlainTextBuffer);
     m_PlainTextView.set_wrap_mode(Gtk::WRAP_WORD);
@@ -73,7 +73,7 @@ BazeriesBox::BazeriesBox()
     m_EncryptedTextLabel.set_text("Encrypted Message");
     m_refEncryptedTextBuffer = Gtk::TextBuffer::create();
     m_refEncryptedTextBuffer->signal_changed().connect(
-        sigc::mem_fun(*this, BazeriesBox::changed_encrypted_text)
+        sigc::mem_fun(*this, &BazeriesBox::changed_encrypted_text)
     );
     m_EncryptedTextView.set_buffer(m_refEncryptedTextBuffer);
     m_EncryptedTextView.set_wrap_mode(Gtk::WRAP_WORD);
