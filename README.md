@@ -39,11 +39,27 @@ clean build.
 
 ### Windows
 
-Use the **MSYS2 UCRT64** shell. Install CMake, the compiler, and GTKmm:
+Use the **MSYS2 UCRT64** shell. Update MSYS2 first:
+
+```sh
+pacman -Syu
+```
+
+If the update asks you to close the shell, reopen UCRT64 and repeat
+`pacman -Syu` until there are no more updates. Then install CMake, Ninja, the
+MinGW GCC toolchain, and GTKmm:
 
 ```sh
 pacman -S --needed mingw-w64-ucrt-x86_64-toolchain \
-  mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-gtkmm3
+  mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-ninja \
+  mingw-w64-ucrt-x86_64-gtkmm3
+```
+
+For an existing non-recursive checkout, initialize the pinned source
+dependencies before configuring:
+
+```sh
+git submodule update --init --recursive
 ```
 
 Then build the application:
@@ -60,6 +76,7 @@ cmake --build build --target package
 ```
 
 This creates `build/crypto-windows.zip`. CPack uses CMake's runtime dependency
-scanner to include `crypto.exe`, the license, and all required non-system
-DLLs. It can be extracted and run on another compatible 64-bit Windows
-machine without an MSYS2 installation.
+scanner to include `crypto.exe`, the license, all required non-system DLLs,
+and the GTK schemas, themes, icons, MIME database, and image loaders. It can
+be extracted and run on another compatible 64-bit Windows machine without an
+MSYS2 installation.
