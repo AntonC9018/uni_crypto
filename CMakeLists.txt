@@ -18,6 +18,10 @@ add_executable(crypto
     third_party/strlib/strlib.cpp
 )
 
+if(WIN32)
+    set_target_properties(crypto PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
 target_compile_features(crypto PRIVATE cxx_std_17)
 target_compile_options(crypto PRIVATE
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra>
